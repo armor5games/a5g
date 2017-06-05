@@ -1,14 +1,14 @@
 package gameserverapi
 
 const (
-	ConfigKey ctxKey = iota
-	LoggerWithoutUserKey
-	DBReadPoolKey
-	DBWritePoolKey
-	DBReadStaticPoolKey
-	StaticDataKey
-	LoginUsersAvatarsCacheKey
-	ShardUsersAvatarsCacheKey
+	CtxConfigKey CtxKey = iota
+	CtxLoggerWithoutUserKey
+	CtxDBReadPoolKey
+	CtxDBWritePoolKey
+	CtxDBReadStaticPoolKey
+	CtxStaticDataKey
+	CtxLoginUsersAvatarsCacheKey
+	CtxShardUsersAvatarsCacheKey
 )
 
-type ctxKey int
+type CtxKey int

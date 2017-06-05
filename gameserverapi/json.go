@@ -64,7 +64,7 @@ func jsonWithDebug(
 	responsePayload interface{},
 	keyValues KV,
 	errs ...*ErrorJSON) (io.Reader, error) {
-	config, ok := ctx.Value(ConfigKey).(*gameserverconfigs.Config)
+	config, ok := ctx.Value(CtxConfigKey).(*gameserverconfigs.Config)
 	if !ok {
 		panic("context.Value fn error")
 	}
