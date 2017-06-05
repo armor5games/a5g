@@ -6,9 +6,9 @@ const (
 	CtxDBReadPoolKey
 	CtxDBWritePoolKey
 	CtxDBReadStaticPoolKey
-	CtxStaticDataKey
-	CtxAvatarLoginUsersKey
-	CtxAvatarShardUsersCacheKey
+	CtxStaticCacheKey
+	CtxUsersLCacheKey
+	CtxUsersSCacheKey
 )
 
 type CtxKey int
