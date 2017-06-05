@@ -8,7 +8,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/armor5games/gameserver/gameserverconfig"
+	"github.com/armor5games/gameserver/gameserverconfigs"
 )
 
 type JSON struct {
@@ -64,7 +64,7 @@ func jsonWithDebug(
 	responsePayload interface{},
 	keyValues KV,
 	errs ...*ErrorJSON) (io.Reader, error) {
-	config, ok := ctx.Value(ConfigKey).(*gameserverconfig.Config)
+	config, ok := ctx.Value(ConfigKey).(*gameserverconfigs.Config)
 	if !ok {
 		panic("context.Value fn error")
 	}

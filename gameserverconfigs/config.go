@@ -1,4 +1,4 @@
-package gameserverconfig
+package gameserverconfigs
 
 import (
 	"errors"
