@@ -9,6 +9,7 @@ const (
 	CtxStaticCacheKey
 	CtxUsersLCacheKey
 	CtxUsersSCacheKey
+	CtxCurrentUserIDKey
 )
 
 type CtxKey int
