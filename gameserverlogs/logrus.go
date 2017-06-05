@@ -19,28 +19,28 @@ type StructuredLogger struct {
 	Logger *logrus.Logger
 }
 
-func (l *StructuredLogger) NewLogEntry(r *http.Request) middleware.LogEntry {
+func (l *StructuredLogger) NewLogEntry(req *http.Request) middleware.LogEntry {
 	entry := &StructuredLoggerEntry{Logger: logrus.NewEntry(l.Logger)}
 	logFields := logrus.Fields{}
 
 	logFields["ts"] = time.Now().UTC().Format(time.RFC1123)
 
-	if reqID := middleware.GetReqID(r.Context()); reqID != "" {
+	if reqID := middleware.GetReqID(req.Context()); reqID != "" {
 		logFields["reqID"] = reqID
 	}
 
 	scheme := "http"
-	if r.TLS != nil {
+	if req.TLS != nil {
 		scheme = "https"
 	}
 	logFields["httpScheme"] = scheme
-	logFields["httpProto"] = r.Proto
-	logFields["httpMethod"] = r.Method
+	logFields["httpProto"] = req.Proto
+	logFields["httpMethod"] = req.Method
 
-	logFields["remoteAddr"] = r.RemoteAddr
-	logFields["userAgent"] = r.UserAgent()
+	logFields["remoteAddr"] = req.RemoteAddr
+	logFields["userAgent"] = req.UserAgent()
 
-	logFields["uri"] = fmt.Sprintf("%s://%s%s", scheme, r.Host, r.RequestURI)
+	logFields["uri"] = fmt.Sprintf("%s://%s%s", scheme, req.Host, req.RequestURI)
 
 	entry.Logger = entry.Logger.WithFields(logFields)
 
@@ -77,19 +77,19 @@ func (l *StructuredLoggerEntry) Panic(v interface{}, stack []byte) {
 // passes through the handler chain, which at any point can be logged
 // with a call to .Print(), .Info(), etc.
 
-func GetLogEntry(r *http.Request) logrus.FieldLogger {
-	entry := middleware.GetLogEntry(r).(*StructuredLoggerEntry)
+func GetLogEntry(req *http.Request) logrus.FieldLogger {
+	entry := middleware.GetLogEntry(req).(*StructuredLoggerEntry)
 	return entry.Logger
 }
 
-func LogEntrySetField(r *http.Request, key string, value interface{}) {
-	if entry, ok := r.Context().Value(middleware.LogEntryCtxKey).(*StructuredLoggerEntry); ok {
+func LogEntrySetField(req *http.Request, key string, value interface{}) {
+	if entry, ok := req.Context().Value(middleware.LogEntryCtxKey).(*StructuredLoggerEntry); ok {
 		entry.Logger = entry.Logger.WithField(key, value)
 	}
 }
 
-func LogEntrySetFields(r *http.Request, fields map[string]interface{}) {
-	if entry, ok := r.Context().Value(middleware.LogEntryCtxKey).(*StructuredLoggerEntry); ok {
+func LogEntrySetFields(req *http.Request, fields map[string]interface{}) {
+	if entry, ok := req.Context().Value(middleware.LogEntryCtxKey).(*StructuredLoggerEntry); ok {
 		entry.Logger = entry.Logger.WithFields(fields)
 	}
 }
