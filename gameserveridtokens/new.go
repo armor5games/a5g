@@ -1,4 +1,4 @@
-package gameserveridtoken
+package gameserveridtokens
 
 import (
 	"crypto/md5"
