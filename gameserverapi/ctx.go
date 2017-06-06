@@ -7,8 +7,7 @@ const (
 	CtxDBWritePoolKey
 	CtxDBReadStaticPoolKey
 	CtxStaticCacheKey
-	CtxUsersLCacheKey
-	CtxUsersSCacheKey
+	CtxUsersCacheKey
 	CtxCurrentUserIDKey
 )
 
