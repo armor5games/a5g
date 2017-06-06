@@ -35,6 +35,8 @@ type Config struct {
 		ServerSecretKey string
 
 		Bugsnag string
+
+		APITimeoutSeconds int
 	}
 
 	LoginServer struct {
@@ -86,13 +88,12 @@ func New(serverType ServerType, pathToConfig string) (*Config, error) {
 
 	c.PathToConfig = pathToConfig
 
+	if c.Server.APITimeoutSeconds == 0 {
+		return nil, errors.New("undefined api timeout")
+	}
+
 	return c, nil
 }
-
-// DBPass()
-// DBHost()
-// DBPort()
-// DBName()
 
 func (c *Config) DBConfig(t DBConfigType) (
 	*struct{ DBUser, DBPass, DBHost, DBPort, DBName string }, error) {
