@@ -15,11 +15,11 @@ type JSON struct {
 	Success bool
 	Errors  []*ErrorJSON `json:",omitempty"`
 	Payload interface{}  `json:",omitempty"`
-	Time    int64        `json:",omitempty"`
+	Time    uint64       `json:",omitempty"`
 }
 
 type ErrorJSON struct {
-	Code   int64
+	Code   uint64
 	Error  error `json:"Message,omitempty"`
 	Public bool  `json:"-"`
 }
@@ -32,7 +32,7 @@ func (e *ErrorJSON) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(&struct {
-		Code    int64
+		Code    uint64
 		Message string `json:",omitempty"`
 	}{
 		Code:    e.Code,
@@ -41,7 +41,7 @@ func (e *ErrorJSON) MarshalJSON() ([]byte, error) {
 
 func (e *ErrorJSON) UnmarshalJSON(b []byte) error {
 	s := &struct {
-		Code    int64
+		Code    uint64
 		Message string
 	}{}
 
@@ -66,11 +66,11 @@ func jsonWithDebug(
 	errs ...*ErrorJSON) (io.Reader, error) {
 	config, ok := ctx.Value(CtxConfigKey).(*gameserverconfigs.Config)
 	if !ok {
-		panic("context.Value fn error")
+		return nil, errors.New("context.Value fn error")
 	}
 
 	if len(keyValues) != 0 {
-		errs = append(errs, KV(keyValues).ResponseErrors()...)
+		errs = append(errs, keyValues.ResponseErrors()...)
 	}
 
 	publicErrors := make([]*ErrorJSON, 0)
@@ -108,7 +108,7 @@ func jsonWithDebug(
 		Success: isSuccess,
 		Errors:  publicErrors,
 		Payload: responsePayload,
-		Time:    time.Now().Unix()})
+		Time:    uint64(time.Now().Unix())})
 
 	return bytes.NewReader(b), err
 }

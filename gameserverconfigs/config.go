@@ -3,7 +3,6 @@ package gameserverconfigs
 import (
 	"errors"
 	"fmt"
-	"strconv"
 
 	"gopkg.in/gcfg.v1"
 )
@@ -25,18 +24,18 @@ type Config struct {
 
 	Server struct {
 		Type    ServerType
-		ID      int
-		Version string
+		ID      uint64
+		Version uint64
 
 		Port          string
 		LogPath       string
-		DebuggingMode int
+		DebuggingMode uint64
 
 		ServerSecretKey string
 
 		Bugsnag string
 
-		APITimeoutSeconds int
+		APITimeoutSeconds uint64
 	}
 
 	LoginServer struct {
@@ -74,7 +73,8 @@ type Config struct {
 	}
 }
 
-func New(serverType ServerType, pathToConfig string) (*Config, error) {
+func New(
+	serverType ServerType, serverVersion uint64, pathToConfig string) (*Config, error) {
 	c := new(Config)
 	err := gcfg.ReadFileInto(c, pathToConfig)
 	if err != nil {
@@ -85,6 +85,11 @@ func New(serverType ServerType, pathToConfig string) (*Config, error) {
 		return nil, errors.New("unknown config type")
 	}
 	c.Server.Type = serverType
+
+	if serverVersion == 0 {
+		return nil, errors.New("server version undefined")
+	}
+	c.Server.Version = serverVersion
 
 	c.PathToConfig = pathToConfig
 
@@ -151,12 +156,4 @@ func (c *Config) DBConfig(t DBConfigType) (
 	}
 
 	return nil, fmt.Errorf("unknown server type: %s", string(c.Server.Type))
-}
-
-func (c *Config) Type() ServerType {
-	return c.Server.Type
-}
-
-func (c *Config) Version() (int64, error) {
-	return strconv.ParseInt(c.Server.Version, 10, 0)
 }

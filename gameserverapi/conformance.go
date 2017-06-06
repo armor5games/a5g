@@ -8,8 +8,8 @@ type Conformance struct {
 
 type ConformanceServer struct {
 	Type         string
-	ID           int
-	Version      int
+	ID           uint64
+	Version      uint64
 	Architecture string
 }
 
@@ -19,9 +19,9 @@ type ConformanceClient struct {
 
 func NewConformance(
 	apiVersion string,
-	infrastructureVersion int,
+	infrastructureVersion uint64,
 	serverTitle, serverName, serverArchitecture string,
-	serverID int) *Conformance {
+	serverID uint64) *Conformance {
 	return &Conformance{
 		Name: serverTitle,
 		API:  &ConformanceClient{Version: apiVersion},
