@@ -57,10 +57,19 @@ func NewSession(ctx context.Context, shardURL *url.URL) (
 	res, err := netClient.Post(shardURL.String(),
 		"application/x-www-form-urlencoded", strings.NewReader(shardURL.RawQuery))
 
+	l, ok := ctx.Value(CtxLoggerWithoutUserKey).(*logrus.Logger)
+	if !ok {
+		return nil, errors.New("context.Value fn error")
+	}
+
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
+	defer func(l *logrus.Logger) {
+		if err := res.Body.Close(); err != nil {
+			l.Error(err.Error())
+		}
+	}(l)
 
 	httpBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -71,11 +80,6 @@ func NewSession(ctx context.Context, shardURL *url.URL) (
 	err = json.Unmarshal(httpBody, shardResponse)
 	if err != nil {
 		return nil, fmt.Errorf("json.Unmarshal fn error: %s", err.Error())
-	}
-
-	l, ok := ctx.Value(CtxLoggerWithoutUserKey).(*logrus.Logger)
-	if !ok {
-		return nil, errors.New("context.Value fn error")
 	}
 
 	kv := NewKV()
