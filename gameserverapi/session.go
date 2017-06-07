@@ -17,12 +17,12 @@ import (
 )
 
 type SessionLoginPayload struct {
-	ID                uint64 `json:"id,omitempty"`
+	UserID            uint64 `json:"userID,omitempty"`
 	UserDataVersion   uint64 `json:"userDataVersion,omitempty"`
 	AccessToken       string `json:"accessToken,omitempty"`
 	ShardURL          string `json:"shardURL,omitempty"`
 	StaticDataVersion uint64 `json:"staticDataVersion,omitempty"`
-	Name              string `json:"name,omitempty"`
+	UserName          string `json:"userName,omitempty"`
 	NewUser           bool   `json:"newUser"`
 }
 
