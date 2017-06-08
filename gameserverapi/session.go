@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/armor5games/gameserver/gameserverconfigs"
-	"github.com/armor5games/gameserver/gameservertokenverifiers"
 	"github.com/sirupsen/logrus"
 )
 
@@ -33,7 +32,7 @@ type SessionShardResponse struct {
 
 type SessionShardPayload struct {
 	AccessToken         string `json:"accessToken,omitempty"`
-	AccessTokenVerifier string `json:"accessTokenVerifier,omitempty"`
+	AccessTokenChecksum string `json:"accessTokenChecksum,omitempty"`
 	UserDataVersion     uint64 `json:"userDataVersion,omitempty"`
 }
 
@@ -121,12 +120,20 @@ func NewSession(ctx context.Context, shardURL *url.URL) (
 		return shardResponse, err
 	}
 
-	accessTokenVerifier :=
-		gameservertokenverifiers.New(accessToken, config.Server.ServerSecretKey)
-	kv["accessTokenVerifier"] = accessTokenVerifier
+	accessTokenChecksum, err := config.NewDummyChecksum(accessToken)
+	if shardResponse.Payload.AccessTokenChecksum != accessTokenChecksum {
+		err = fmt.Errorf("gameserverconfigs.(*Config)NewDummyChecksum fn: %s",
+			err.Error())
 
-	if shardResponse.Payload.AccessTokenVerifier != accessTokenVerifier {
-		err = errors.New("AccessToken and AccessTokenVerifier mismatch")
+		l.WithFields(logrus.Fields(kv)).Error(err.Error())
+
+		return shardResponse, err
+	}
+
+	kv["accessTokenChecksum"] = accessTokenChecksum
+
+	if shardResponse.Payload.AccessTokenChecksum != accessTokenChecksum {
+		err = errors.New("AccessToken and AccessTokenChecksum mismatch")
 
 		l.WithFields(logrus.Fields(kv)).Error(err.Error())
 

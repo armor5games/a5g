@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"strings"
 	"time"
 
 	"github.com/armor5games/gameserver/gameserverconfigs"
@@ -56,6 +57,41 @@ func (e *ErrorJSON) UnmarshalJSON(b []byte) error {
 	}
 
 	return nil
+}
+
+func (j *JSON) KV() (KV, error) {
+	if j == nil {
+		return nil, errors.New("empty api response")
+	}
+
+	if len(j.Errors) == 0 {
+		return nil, errors.New("empty key values")
+	}
+
+	kv := NewKV()
+
+	for _, e := range j.Errors {
+		if e.Code != KVAPIErrorCode {
+			continue
+		}
+
+		if e.Error.Error() == "" {
+			return nil, errors.New("empty kv")
+		}
+
+		x := strings.SplitN(e.Error.Error(), ":", 2)
+		if len(x) != 2 {
+			return nil, errors.New("bad kv format")
+		}
+
+		kv[x[0]] = x[1]
+	}
+
+	if len(kv) == 0 {
+		return nil, errors.New("empty kv")
+	}
+
+	return kv, nil
 }
 
 func jsonWithDebug(
