@@ -37,7 +37,7 @@ type SessionShardPayload struct {
 }
 
 func (ssr *SessionShardPayload) IsAccessTokenPresent() bool {
-	return len(ssr.AccessToken) > 16
+	return len(ssr.AccessToken) >= 16
 }
 
 func (ssr *SessionShardPayload) IsUserDataVersionPresent() bool {
