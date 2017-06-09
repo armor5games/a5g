@@ -52,16 +52,16 @@ func NewSession(ctx context.Context, shardURL *url.URL) (
 		return nil, errors.New("context.Value fn error")
 	}
 
-	netClient := &http.Client{
-		Timeout: time.Second * time.Duration(config.Server.APITimeoutSeconds)}
-	res, err := netClient.Post(shardURL.String(),
-		"application/x-www-form-urlencoded", strings.NewReader(shardURL.RawQuery))
-
 	l, ok := ctx.Value(CtxLoggerKey).(*logrus.Logger)
 	if !ok {
 		return nil, errors.New("context.Value fn error")
 	}
 
+	netClient := &http.Client{
+		Timeout: time.Second * time.Duration(config.Server.APITimeoutSeconds)}
+
+	res, err := netClient.Post(shardURL.String(),
+		"application/x-www-form-urlencoded", strings.NewReader(shardURL.RawQuery))
 	if err != nil {
 		return nil, err
 	}
