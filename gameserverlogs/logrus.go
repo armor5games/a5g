@@ -78,7 +78,7 @@ func (l *StructuredLoggerEntry) Panic(v interface{}, stack []byte) {
 // with a call to .Print(), .Info(), etc.
 
 func GetLogEntry(r *http.Request) logrus.FieldLogger {
-	entry := middleware.GetLogEntry(r).(*StructuredLoggerEntry)
+	entry, _ := middleware.GetLogEntry(r).(*StructuredLoggerEntry)
 	return entry.Logger
 }
 
