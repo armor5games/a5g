@@ -5,7 +5,7 @@ go:
   - 1.7.x
   - 1.8.x
   - master
-install:
+before_install:
   - go get -v -u github.com/nbio/st
   - go get -v -u github.com/client9/misspell/cmd/misspell
   - go get -v -u github.com/fzipp/gocyclo
