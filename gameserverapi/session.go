@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"mime"
 	"net/http"
 	"net/url"
 	"strings"
@@ -56,7 +57,7 @@ func NewSession(ctx context.Context, shardURL *url.URL) (
 	res, err := netClient.Post(shardURL.String(),
 		"application/x-www-form-urlencoded", strings.NewReader(shardURL.RawQuery))
 
-	l, ok := ctx.Value(CtxLoggerWithoutUserKey).(*logrus.Logger)
+	l, ok := ctx.Value(CtxLoggerKey).(*logrus.Logger)
 	if !ok {
 		return nil, errors.New("context.Value fn error")
 	}
@@ -75,20 +76,42 @@ func NewSession(ctx context.Context, shardURL *url.URL) (
 		return nil, fmt.Errorf("ioutil.ReadAll fn error: %s", err.Error())
 	}
 
+	kv := NewKV()
+	kv["httpStatusCode"] = res.StatusCode
+
+	if res.StatusCode != http.StatusOK {
+		err = errors.New("session http status code error")
+		l.WithFields(logrus.Fields(kv)).Error(err.Error())
+	}
+
+	kv["httpContentType"] = res.Header.Get("Content-type")
+
+	t, _, err := mime.ParseMediaType(res.Header.Get("Content-type"))
+	if err != nil {
+		return nil, fmt.Errorf("mime.ParseMediaType fn error: %s", err.Error())
+	}
+
+	if t != "application/json" {
+		err = errors.New("shard server's response is not in json format")
+
+		kv["httpBody"] = string(httpBody)
+		l.WithFields(logrus.Fields(kv)).Error(err.Error())
+
+		return nil, err
+	}
+
 	shardResponse := &SessionShardResponse{}
 	err = json.Unmarshal(httpBody, shardResponse)
 	if err != nil {
 		return nil, fmt.Errorf("json.Unmarshal fn error: %s", err.Error())
 	}
 
-	kv := NewKV()
-	kv["httpStatusCode"] = res.StatusCode
-	kv["sessionSuccessStatus"] = shardResponse.Success
-
-	if res.StatusCode != 200 || !shardResponse.Success {
-		err = errors.New("session status error")
+	if !shardResponse.Success {
+		err = errors.New("session is not successful")
 		l.WithFields(logrus.Fields(kv)).Error(err.Error())
 	}
+
+	kv["sessionSuccessStatus"] = shardResponse.Success
 
 	if shardResponse.Payload == nil {
 		err = errors.New("empty session payload")
@@ -102,7 +125,7 @@ func NewSession(ctx context.Context, shardURL *url.URL) (
 	kv["userNewDataVersion"] = userNewDataVersion
 
 	if !shardResponse.Payload.IsUserDataVersionPresent() {
-		err = errors.New("shard server return zero user data version")
+		err = errors.New("shard server return zero user's data version")
 
 		l.WithFields(logrus.Fields(kv)).Error(err.Error())
 
