@@ -1,4 +1,4 @@
-package gameserverapi
+package goarmorapi
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/armor5games/gameserver/gameserverconfigs"
+	"github.com/armor5games/goarmor/goarmorconfigs"
 	"github.com/sirupsen/logrus"
 )
 
@@ -47,7 +47,7 @@ func (ssr *SessionShardPayload) IsUserDataVersionPresent() bool {
 
 func NewSession(ctx context.Context, shardURL *url.URL) (
 	*SessionShardResponse, error) {
-	config, ok := ctx.Value(CtxConfigKey).(*gameserverconfigs.Config)
+	config, ok := ctx.Value(CtxConfigKey).(*goarmorconfigs.Config)
 	if !ok {
 		return nil, errors.New("context.Value fn error")
 	}

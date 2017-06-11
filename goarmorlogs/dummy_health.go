@@ -1,4 +1,4 @@
-package gameserverlogs
+package goarmorlogs
 
 import "github.com/sirupsen/logrus"
 

@@ -1,4 +1,4 @@
-package gameserverapi
+package goarmorapi
 
 const (
 	CtxConfigKey CtxKey = iota

@@ -1,4 +1,4 @@
-package gameserverapi
+package goarmorapi
 
 import (
 	"fmt"

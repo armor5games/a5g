@@ -1,4 +1,4 @@
-package gameserverlogs
+package goarmorlogs
 
 type DummyLogger interface {
 	Print(...interface{})

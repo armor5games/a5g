@@ -1,4 +1,4 @@
-# Armor5games game server packages
+# Armorgo is an Armor5games game server packages
 
 [![build status](https://travis-ci.org/armor5games/gameserver.svg)](https://travis-ci.org/armor5games/gameserver)
 

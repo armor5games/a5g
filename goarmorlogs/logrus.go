@@ -1,6 +1,6 @@
-// Package gameserverlogs by chi example
+// package goarmorlogs by chi example
 // <https://github.com/pressly/chi/blob/master/_examples/logging/main.go>
-package gameserverlogs
+package goarmorlogs
 
 import (
 	"fmt"

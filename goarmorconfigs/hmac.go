@@ -1,4 +1,4 @@
-package gameserverconfigs
+package goarmorconfigs
 
 import (
 	"crypto/hmac"

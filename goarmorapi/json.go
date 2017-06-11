@@ -1,4 +1,4 @@
-package gameserverapi
+package goarmorapi
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/armor5games/gameserver/gameserverconfigs"
+	"github.com/armor5games/goarmor/goarmorconfigs"
 )
 
 type JSON struct {
@@ -100,7 +100,7 @@ func jsonWithDebug(
 	responsePayload interface{},
 	keyValues KV,
 	errs ...*ErrorJSON) (io.Reader, error) {
-	config, ok := ctx.Value(CtxConfigKey).(*gameserverconfigs.Config)
+	config, ok := ctx.Value(CtxConfigKey).(*goarmorconfigs.Config)
 	if !ok {
 		return nil, errors.New("context.Value fn error")
 	}
