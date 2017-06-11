@@ -1,6 +1,6 @@
-# Armorgo is an Armor5games game server packages
+# Goarmor
 
-[![build status](https://travis-ci.org/armor5games/gameserver.svg)](https://travis-ci.org/armor5games/gameserver)
+[![build status](https://travis-ci.org/armor5games/goarmor.svg)](https://travis-ci.org/armor5games/goarmor)
 
 Lightweight packages for building Go 1.7+ game servers.
 
