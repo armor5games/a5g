@@ -1,8 +1,8 @@
 package goarmorapi
 
 const (
-	CtxConfigKey CtxKey = iota
-	CtxLoggerKey
+	CtxKeyConfig CtxKey = iota
+	CtxKeyLogger
 )
 
 type CtxKey int

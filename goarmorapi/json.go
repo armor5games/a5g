@@ -100,7 +100,7 @@ func jsonWithDebug(
 	responsePayload interface{},
 	keyValues KV,
 	errs ...*ErrorJSON) (io.Reader, error) {
-	config, ok := ctx.Value(CtxConfigKey).(*goarmorconfigs.Config)
+	config, ok := ctx.Value(CtxKeyConfig).(*goarmorconfigs.Config)
 	if !ok {
 		return nil, errors.New("context.Value fn error")
 	}

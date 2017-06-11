@@ -8,8 +8,6 @@ import (
 	"io/ioutil"
 	"mime"
 	"net/http"
-	"net/url"
-	"strings"
 	"time"
 
 	"github.com/armor5games/goarmor/goarmorconfigs"
@@ -45,23 +43,22 @@ func (ssr *SessionShardPayload) IsUserDataVersionPresent() bool {
 	return ssr.UserDataVersion != 0
 }
 
-func NewSession(ctx context.Context, shardURL *url.URL) (
+func NewSession(ctx context.Context, requestToshard *http.Request) (
 	*SessionShardResponse, error) {
-	config, ok := ctx.Value(CtxConfigKey).(*goarmorconfigs.Config)
+	config, ok := ctx.Value(CtxKeyConfig).(*goarmorconfigs.Config)
 	if !ok {
 		return nil, errors.New("context.Value fn error")
 	}
 
-	l, ok := ctx.Value(CtxLoggerKey).(*logrus.Logger)
+	l, ok := ctx.Value(CtxKeyLogger).(*logrus.Logger)
 	if !ok {
 		return nil, errors.New("context.Value fn error")
 	}
 
-	netClient := &http.Client{
+	c := &http.Client{
 		Timeout: time.Second * time.Duration(config.Server.APITimeoutSeconds)}
 
-	res, err := netClient.Post(shardURL.String(),
-		"application/x-www-form-urlencoded", strings.NewReader(shardURL.RawQuery))
+	res, err := c.Do(requestToshard)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +122,7 @@ func NewSession(ctx context.Context, shardURL *url.URL) (
 	kv["userNewDataVersion"] = userNewDataVersion
 
 	if !shardResponse.Payload.IsUserDataVersionPresent() {
-		err = errors.New("shard server return zero user's data version")
+		err = errors.New("shard server retruns zero user's data version")
 
 		l.WithFields(logrus.Fields(kv)).Error(err.Error())
 
