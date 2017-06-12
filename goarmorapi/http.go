@@ -8,6 +8,9 @@ import (
 	"fmt"
 )
 
+// ResponsePlain requires that the calling party itself set
+// `w.Header().Set("Content-type", "text/plain; charset=utf-8")` header
+// if the WriteHeader function was called on http.ResponseWriter.
 func ResponsePlain(w http.ResponseWriter, r *http.Request, rd io.Reader) error {
 	w.Header().Set("Content-type", "text/plain; charset=utf-8")
 	b := new(bytes.Buffer)
@@ -22,6 +25,9 @@ func ResponsePlain(w http.ResponseWriter, r *http.Request, rd io.Reader) error {
 	return nil
 }
 
+// ResponseXML requires that the calling party itself set
+// `w.Header().Set("Content-type", "application/xml; charset=utf-8")` header
+// if the WriteHeader function was called on http.ResponseWriter.
 func ResponseXML(w http.ResponseWriter, r *http.Request, rd io.Reader) error {
 	w.Header().Set("Content-type", "application/xml; charset=utf-8")
 
@@ -37,6 +43,9 @@ func ResponseXML(w http.ResponseWriter, r *http.Request, rd io.Reader) error {
 	return nil
 }
 
+// ResponseJSON requires that the calling party itself set
+// `w.Header().Set("Content-type", "application/json; charset=utf-8")` header
+// if the WriteHeader function was called on http.ResponseWriter.
 func ResponseJSON(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -57,6 +66,9 @@ func ResponseJSON(
 	return nil
 }
 
+// ResponseJSONWithDebug requires that the calling party itself set
+// `w.Header().Set("Content-type", "application/json; charset=utf-8")` header
+// if the WriteHeader function was called on http.ResponseWriter.
 func ResponseJSONWithDebug(
 	w http.ResponseWriter,
 	r *http.Request,
