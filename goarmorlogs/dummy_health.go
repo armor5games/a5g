@@ -1,6 +1,11 @@
 package goarmorlogs
 
-import "github.com/sirupsen/logrus"
+import (
+	"fmt"
+
+	"github.com/armor5games/goarmor/goarmorapi"
+	"github.com/sirupsen/logrus"
+)
 
 type DummyHealth struct {
 	Logger *logrus.Logger
@@ -19,13 +24,19 @@ func (l *DummyHealth) EventKv(eventName string, kvs map[string]string) {
 }
 
 func (l *DummyHealth) EventErr(eventName string, err error) error {
-	l.Logger.Error(eventName)
-	return nil
+	err = fmt.Errorf("%s %s", eventName, err.Error())
+	l.Logger.Error(err.Error())
+	return err
 }
 
 func (l *DummyHealth) EventErrKv(eventName string, err error, kvs map[string]string) error {
-	l.Logger.WithFields(dummyHealthKVToLogrusFields(kvs)).Error(eventName)
-	return nil
+	logrusKV := dummyHealthKVToLogrusFields(kvs)
+	goarmorapiKV := goarmorapi.KV(logrusKV)
+
+	err = fmt.Errorf("%s %s", eventName, err.Error())
+	l.Logger.WithFields(logrusKV).Error(err.Error())
+
+	return fmt.Errorf("%s %s", err.Error(), goarmorapiKV.String())
 }
 
 func (l *DummyHealth) Timing(eventName string, nanoseconds int64) {
@@ -33,7 +44,6 @@ func (l *DummyHealth) Timing(eventName string, nanoseconds int64) {
 		WithFields(logrus.Fields{"elapsedNanoseconds": nanoseconds}).Debug(eventName)
 }
 
-//
 func (l *DummyHealth) TimingKv(eventName string, nanoseconds int64, kvs map[string]string) {
 	f := dummyHealthKVToLogrusFields(kvs)
 	f["elapsedNanoseconds"] = nanoseconds
