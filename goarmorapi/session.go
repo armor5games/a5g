@@ -18,6 +18,7 @@ type SessionLoginPayload struct {
 	UserID            uint64 `json:"userID,omitempty"`
 	UserDataVersion   uint64 `json:"userDataVersion,omitempty"`
 	AccessToken       string `json:"accessToken,omitempty"`
+	AccessExpiresAt   uint64 `json:"accessExpiresAt,omitempty"`
 	ShardURL          string `json:"shardURL,omitempty"`
 	StaticDataVersion uint64 `json:"staticDataVersion,omitempty"`
 	UserName          string `json:"userName,omitempty"`
@@ -32,6 +33,7 @@ type SessionShardResponse struct {
 type SessionShardPayload struct {
 	AccessToken         string `json:"accessToken,omitempty"`
 	AccessTokenChecksum string `json:"accessTokenChecksum,omitempty"`
+	AccessExpiresAt     uint64 `json:"accessExpiresAt,omitempty"`
 	UserDataVersion     uint64 `json:"userDataVersion,omitempty"`
 }
 
