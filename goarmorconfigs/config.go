@@ -27,9 +27,9 @@ type Config struct {
 		ID      uint64
 		Version uint64
 
-		ListenAddress string
-		LogPath       string
-		DebuggingMode uint64
+		ListenAddress  string
+		LogPath        string
+		DebuggingLevel uint64
 
 		ServerSecretKey string
 

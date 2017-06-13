@@ -109,7 +109,7 @@ func ResponseJSON(
 
 	publicErrors := make([]*ErrorJSON, 0)
 
-	if config.Server.DebuggingMode == 1 {
+	if config.Server.DebuggingLevel > 0 {
 		publicErrors = errs
 	} else {
 		isKVRemoved := false
