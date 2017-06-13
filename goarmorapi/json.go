@@ -1,11 +1,9 @@
 package goarmorapi
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
-	"io"
 	"strings"
 	"time"
 
@@ -94,12 +92,12 @@ func (j *JSON) KV() (KV, error) {
 	return kv, nil
 }
 
-func jsonWithDebug(
+func ResponseJSON(
 	ctx context.Context,
 	isSuccess bool,
 	responsePayload interface{},
 	keyValues KV,
-	errs ...*ErrorJSON) (io.Reader, error) {
+	errs ...*ErrorJSON) (*JSON, error) {
 	config, ok := ctx.Value(CtxKeyConfig).(*goarmorconfigs.Config)
 	if !ok {
 		return nil, errors.New("context.Value fn error")
@@ -140,11 +138,9 @@ func jsonWithDebug(
 		}
 	}
 
-	b, err := json.Marshal(JSON{
+	return &JSON{
 		Success: isSuccess,
 		Errors:  publicErrors,
 		Payload: responsePayload,
-		Time:    uint64(time.Now().Unix())})
-
-	return bytes.NewReader(b), err
+		Time:    uint64(time.Now().Unix())}, nil
 }
