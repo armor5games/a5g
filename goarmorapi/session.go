@@ -45,7 +45,7 @@ func (ssr *SessionShardPayload) IsUserDataVersionPresent() bool {
 	return ssr.UserDataVersion != 0
 }
 
-func NewSession(ctx context.Context, requestToshard *http.Request) (
+func NewSession(ctx context.Context, requestToShard *http.Request) (
 	*SessionShardResponse, error) {
 	config, ok := ctx.Value(CtxKeyConfig).(*goarmorconfigs.Config)
 	if !ok {
@@ -60,7 +60,7 @@ func NewSession(ctx context.Context, requestToshard *http.Request) (
 	c := &http.Client{
 		Timeout: time.Second * time.Duration(config.Server.APITimeoutSeconds)}
 
-	res, err := c.Do(requestToshard)
+	res, err := c.Do(requestToShard)
 	if err != nil {
 		return nil, err
 	}
