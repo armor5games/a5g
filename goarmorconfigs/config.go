@@ -3,6 +3,7 @@ package goarmorconfigs
 import (
 	"errors"
 	"fmt"
+	"net/url"
 
 	"gopkg.in/gcfg.v1"
 )
@@ -26,6 +27,7 @@ type Config struct {
 		Type    ServerType
 		ID      uint64
 		Version uint64
+		URL     string
 
 		ListenAddress  string
 		LogPath        string
@@ -90,6 +92,14 @@ func New(
 		return nil, errors.New("server version undefined")
 	}
 	c.Server.Version = serverVersion
+
+	if c.Server.URL == "" {
+		return nil, errors.New("server url undefined")
+	}
+
+	if _, err = url.Parse(c.Server.URL); err != nil {
+		return nil, fmt.Errorf("url.Parse fn error: %s", err.Error())
+	}
 
 	c.PathToConfig = pathToConfig
 

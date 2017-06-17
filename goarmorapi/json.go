@@ -10,7 +10,12 @@ import (
 	"github.com/armor5games/goarmor/goarmorconfigs"
 )
 
-type JSON struct {
+type JSONRequest struct {
+	Payload interface{} `json:",omitempty"`
+	Time    uint64      `json:",omitempty"`
+}
+
+type JSONResponse struct {
 	Success bool
 	Errors  []*ErrorJSON `json:",omitempty"`
 	Payload interface{}  `json:",omitempty"`
@@ -57,7 +62,7 @@ func (e *ErrorJSON) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (j *JSON) KV() (KV, error) {
+func (j *JSONResponse) KV() (KV, error) {
 	if j == nil {
 		return nil, errors.New("empty api response")
 	}
@@ -92,12 +97,20 @@ func (j *JSON) KV() (KV, error) {
 	return kv, nil
 }
 
-func ResponseJSON(
+func NewJSONRequest(
+	ctx context.Context,
+	responsePayload interface{}) (*JSONRequest, error) {
+	return &JSONRequest{
+		Payload: responsePayload,
+		Time:    uint64(time.Now().Unix())}, nil
+}
+
+func NewJSONResponse(
 	ctx context.Context,
 	isSuccess bool,
 	responsePayload interface{},
 	keyValues KV,
-	errs ...*ErrorJSON) (*JSON, error) {
+	errs ...*ErrorJSON) (*JSONResponse, error) {
 	config, ok := ctx.Value(CtxKeyConfig).(*goarmorconfigs.Config)
 	if !ok {
 		return nil, errors.New("context.Value fn error")
@@ -138,7 +151,7 @@ func ResponseJSON(
 		}
 	}
 
-	return &JSON{
+	return &JSONResponse{
 		Success: isSuccess,
 		Errors:  publicErrors,
 		Payload: responsePayload,

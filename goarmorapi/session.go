@@ -26,7 +26,7 @@ type SessionLoginPayload struct {
 }
 
 type SessionShardResponse struct {
-	JSON
+	JSONResponse
 	Payload *SessionShardPayload `json:",omitempty"`
 }
 
@@ -99,7 +99,7 @@ func NewSession(ctx context.Context, requestToShard *http.Request) (
 		return nil, err
 	}
 
-	shardResponse := &SessionShardResponse{}
+	shardResponse := new(SessionShardResponse)
 	err = json.Unmarshal(httpBody, shardResponse)
 	if err != nil {
 		return nil, fmt.Errorf("json.Unmarshal fn error: %s", err.Error())

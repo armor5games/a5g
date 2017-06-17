@@ -8,6 +8,8 @@ import (
 	"fmt"
 )
 
+const HMACAlgorithm = "sha256"
+
 func (c *Config) HMACChecksum(payload []byte) (string, error) {
 	serverSecretKey := c.Server.ServerSecretKey
 	if serverSecretKey == "" {
