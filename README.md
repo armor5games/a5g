@@ -3,6 +3,7 @@
 [![build status](https://travis-ci.org/armor5games/goarmor.svg)](https://travis-ci.org/armor5games/goarmor)
 
 Lightweight packages for building Go 1.7+ game servers.
+See .travis.yml for supported go versions.
 
 ## License
 
