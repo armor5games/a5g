@@ -5,6 +5,10 @@ import "fmt"
 // KVS is an key and values of type string
 type KVS map[string]string
 
+func NewKVS() KVS {
+	return newKVS(nil)
+}
+
 func (keyValues KVS) KV() KV {
 	if len(keyValues) == 0 {
 		return nil
@@ -32,4 +36,12 @@ func (keyValues KVS) ResponseErrors() []*ErrorJSON {
 	}
 
 	return e
+}
+
+func newKVS(m map[string]string) KVS {
+	if m == nil {
+		m = make(map[string]string)
+	}
+
+	return KVS(m)
 }
