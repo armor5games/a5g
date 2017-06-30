@@ -23,9 +23,25 @@ type JSONResponse struct {
 }
 
 type ErrorJSON struct {
-	Code   uint64
-	Error  error `json:"Message,omitempty"`
-	Public bool  `json:"-"`
+	Code     uint64
+	Error    error             `json:"Message,omitempty"`
+	Public   bool              `json:"-"`
+	Severity ErrorJSONSeverity `json:"-"`
+}
+
+type ErrorJSONSeverity uint64
+
+const (
+	ErrSeverityDebug ErrorJSONSeverity = iota
+	ErrSeverityInfo
+	ErrSeverityWarn
+	ErrSeverityError
+	ErrSeverityFatal
+	ErrSeverityPanic
+)
+
+type ResponseErrorer interface {
+	ResponseErrors() []*ErrorJSON
 }
 
 func (e *ErrorJSON) MarshalJSON() ([]byte, error) {
@@ -109,20 +125,18 @@ func NewJSONResponse(
 	ctx context.Context,
 	isSuccess bool,
 	responsePayload interface{},
-	keyValues KV,
+	responseErrorer ResponseErrorer,
 	errs ...*ErrorJSON) (*JSONResponse, error) {
-	config, ok := ctx.Value(CtxKeyConfig).(*goarmorconfigs.Config)
+	config, ok := ctx.Value(CtxKeyConfig).(goarmorconfigs.Configer)
 	if !ok {
 		return nil, errors.New("context.Value fn error")
 	}
 
-	if len(keyValues) != 0 {
-		errs = append(errs, keyValues.ResponseErrors()...)
-	}
+	errs = append(errs, responseErrorer.ResponseErrors()...)
 
 	publicErrors := make([]*ErrorJSON, 0)
 
-	if config.Server.DebuggingLevel > 0 {
+	if config.ServerDebuggingLevel() > 0 {
 		publicErrors = errs
 	} else {
 		isKVRemoved := false
@@ -134,7 +148,7 @@ func NewJSONResponse(
 				continue
 			}
 
-			if x.Code == 1100 {
+			if x.Code == KVAPIErrorCode {
 				isKVRemoved = true
 
 				continue
@@ -147,7 +161,7 @@ func NewJSONResponse(
 		if isKVRemoved {
 			// Add empty (only with "code") "ErrorJSON" structure in order to be able to
 			// determine was an key-values in hadler's response.
-			publicErrors = append(publicErrors, &ErrorJSON{Code: 1100})
+			publicErrors = append(publicErrors, &ErrorJSON{Code: KVAPIErrorCode})
 		}
 	}
 

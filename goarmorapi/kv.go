@@ -7,10 +7,25 @@ import (
 
 const KVAPIErrorCode = 1100
 
+// KV is an key-values
 type KV map[string]interface{}
 
 func NewKV() KV {
 	return newKV(nil)
+}
+
+func (keyValues KV) KVS() KVS {
+	if len(keyValues) == 0 {
+		return nil
+	}
+
+	kvs := make(KVS)
+
+	for k, v := range keyValues {
+		kvs[k] = fmt.Sprint(v)
+	}
+
+	return kvs
 }
 
 func (keyValues KV) Merge(newKeyValues KV) {
