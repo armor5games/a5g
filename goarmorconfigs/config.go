@@ -73,7 +73,7 @@ type Config struct {
 		WDBPass string
 		WDBPort string
 
-        UsrSec string
+		UsrSec string
 	}
 }
 
@@ -170,7 +170,7 @@ func (c *Config) DBConfig(t DBConfigType) (
 	return nil, fmt.Errorf("unknown server type: %s", string(c.Server.Type))
 }
 
-func (c *Config) SEConfig() (*struct { UserSecure string }, error) {
-    return &struct{ UserSecure string }{
-        UserSecure: c.ShardServer.UsrSec }, nil
+func (c *Config) SEConfig() (*struct{ UserSecure string }, error) {
+	return &struct{ UserSecure string }{
+		UserSecure: c.ShardServer.UsrSec}, nil
 }
