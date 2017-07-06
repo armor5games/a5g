@@ -20,11 +20,6 @@ const (
 type ServerType int
 type DBConfigType int
 
-type StaticSection struct {
-	StaticUnits  string
-	StaticBuilds string
-}
-
 type Config struct {
 	PathToConfig string
 
@@ -81,7 +76,9 @@ type Config struct {
 		USRSec string
 	}
 
-	Static StaticSection
+	Static struct {
+		Directory string
+	}
 }
 
 func New(
@@ -183,12 +180,6 @@ func (c *Config) SEConfig() (*struct{ UserSecure string }, error) {
 	}, nil
 }
 
-// ooooh, fix me please
-func (c *Config) StaticStorage() (map[string]string, error) {
-	s := map[string]string{
-		"units":  c.Static.StaticUnits,
-		"builds": c.Static.StaticBuilds,
-	}
-
-	return s, nil
+func (c *Config) StaticStorage() (string, error) {
+	return c.Static.Directory, nil
 }
