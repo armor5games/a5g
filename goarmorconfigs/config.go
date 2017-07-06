@@ -20,6 +20,11 @@ const (
 type ServerType int
 type DBConfigType int
 
+type StaticSection struct {
+	StaticUnits  string
+	StaticBuilds string
+}
+
 type Config struct {
 	PathToConfig string
 
@@ -73,8 +78,10 @@ type Config struct {
 		WDBPass string
 		WDBPort string
 
-        UsrSec string
+		USRSec string
 	}
+
+	Static StaticSection
 }
 
 func New(
@@ -170,7 +177,18 @@ func (c *Config) DBConfig(t DBConfigType) (
 	return nil, fmt.Errorf("unknown server type: %s", string(c.Server.Type))
 }
 
-func (c *Config) SEConfig() (*struct { UserSecure string }, error) {
-    return &struct{ UserSecure string }{
-        UserSecure: c.ShardServer.UsrSec }, nil
+func (c *Config) SEConfig() (*struct{ UserSecure string }, error) {
+	return &struct{ UserSecure string }{
+		UserSecure: c.ShardServer.USRSec,
+	}, nil
+}
+
+// ooooh, fix me please
+func (c *Config) StaticStorage() (map[string]string, error) {
+	s := map[string]string{
+		"units":  c.Static.StaticUnits,
+		"builds": c.Static.StaticBuilds,
+	}
+
+	return s, nil
 }
