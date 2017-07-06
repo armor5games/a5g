@@ -23,6 +23,12 @@ func (keyValues KVS) KV() KV {
 	return kv
 }
 
+func (keyValues KVS) Merge(newKeyValues KVS) {
+	for k, v := range newKeyValues {
+		keyValues[k] = v
+	}
+}
+
 func (keyValues KVS) ResponseErrors() []*ErrorJSON {
 	if len(keyValues) == 0 {
 		return nil
