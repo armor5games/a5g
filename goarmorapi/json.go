@@ -142,7 +142,7 @@ func NewJSONResponse(
 		isKVRemoved := false
 
 		for _, x := range errs {
-			if x.Public == true {
+			if x.Public {
 				publicErrors = append(publicErrors, x)
 
 				continue
