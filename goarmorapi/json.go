@@ -134,16 +134,29 @@ func NewJSONResponse(
 
 	errs = append(errs, responseErrorer.ResponseErrors()...)
 
-	publicErrors := make([]*ErrorJSON, 0)
+	var publicErrors []*ErrorJSON
 
 	if config.ServerDebuggingLevel() > 0 {
-		publicErrors = errs
+		for _, x := range errs {
+			publicErrors = append(publicErrors,
+				&ErrorJSON{
+					Code:     x.Code,
+					Error:    errors.New(x.Error.Error()),
+					Public:   x.Public,
+					Severity: x.Severity})
+		}
+
 	} else {
 		isKVRemoved := false
 
 		for _, x := range errs {
 			if x.Public {
-				publicErrors = append(publicErrors, x)
+				publicErrors = append(publicErrors,
+					&ErrorJSON{
+						Code:     x.Code,
+						Error:    errors.New(x.Error.Error()),
+						Public:   x.Public,
+						Severity: x.Severity})
 
 				continue
 			}
@@ -154,8 +167,8 @@ func NewJSONResponse(
 				continue
 			}
 
-			x.Error = nil
-			publicErrors = append(publicErrors, x)
+			publicErrors = append(publicErrors,
+				&ErrorJSON{Code: x.Code, Severity: x.Severity})
 		}
 
 		if isKVRemoved {
