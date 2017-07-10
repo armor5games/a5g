@@ -23,7 +23,8 @@ type JSONResponse struct {
 }
 
 type ErrorJSON struct {
-	Code     uint64
+	Code uint64
+	// TODO: Rename "Error" to "Err"
 	Error    error             `json:"Message,omitempty"`
 	Public   bool              `json:"-"`
 	Severity ErrorJSONSeverity `json:"-"`
