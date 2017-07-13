@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/pressly/chi/middleware"
+	"github.com/go-chi/chi/middleware"
 	"github.com/sirupsen/logrus"
 )
 
