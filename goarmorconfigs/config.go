@@ -34,6 +34,7 @@ type Config struct {
 		DebuggingLevel uint64
 
 		ServerSecretKey string
+		ClientSecretKey string
 
 		Bugsnag string
 
@@ -72,8 +73,6 @@ type Config struct {
 		WDBHost string
 		WDBPass string
 		WDBPort string
-
-		USRSec string
 	}
 
 	Static struct {
@@ -176,7 +175,7 @@ func (c *Config) DBConfig(t DBConfigType) (
 
 func (c *Config) SEConfig() (*struct{ UserSecure string }, error) {
 	return &struct{ UserSecure string }{
-		UserSecure: c.ShardServer.USRSec,
+		UserSecure: c.Server.ClientSecretKey,
 	}, nil
 }
 

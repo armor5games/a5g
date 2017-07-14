@@ -21,10 +21,11 @@ func (c *Config) NewDummyChecksum(s string) (string, error) {
 
 func (c *Config) NewDummyUserChecksum(payload []byte, secure []byte) (
 	string, error) {
-	if c == nil || c.ShardServer.USRSec == "" {
+	if c == nil || c.Server.ClientSecretKey == "" {
 		return "", errors.New("Empty user secret")
 	}
 
-	return fmt.Sprintf("%x", md5.Sum(
-		[]byte(fmt.Sprintf("%s%s%s", payload, secure, c.ShardServer.USRSec)))), nil
+	s := fmt.Sprintf("%s%s%s", payload, secure, c.Server.ClientSecretKey)
+
+	return fmt.Sprintf("%x", md5.Sum([]byte(s))), nil
 }
