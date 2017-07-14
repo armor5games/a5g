@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/armor5games/goarmor/goarmorchecksums"
 	"github.com/armor5games/goarmor/goarmorconfigs"
 	"github.com/sirupsen/logrus"
 )
@@ -142,7 +143,8 @@ func NewSession(ctx context.Context, requestToShard *http.Request) (
 		return shardResponse, err
 	}
 
-	accessTokenChecksum, err := config.NewDummyChecksum(accessToken)
+	accessTokenChecksum, err :=
+		goarmorchecksums.New([]byte(accessToken), config.Server.ServerSecretKey)
 	if shardResponse.Payload.AccessTokenChecksum != accessTokenChecksum {
 		err = fmt.Errorf("gameserverconfigs.(*Config)NewDummyChecksum fn: %s",
 			err.Error())
