@@ -128,7 +128,7 @@ func NewJSONResponse(
 	responsePayload interface{},
 	responseErrorer ResponseErrorer,
 	errs ...*ErrorJSON) (*JSONResponse, error) {
-	publicErrors, err := NewJSONResponseErrors(ctx, responseErrorer, errs...)
+	publicErrors, err := newJSONResponseErrors(ctx, responseErrorer, errs...)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func NewJSONResponse(
 		Time:    uint64(time.Now().Unix())}, nil
 }
 
-func NewJSONResponseErrors(
+func newJSONResponseErrors(
 	ctx context.Context,
 	responseErrorer ResponseErrorer,
 	errs ...*ErrorJSON) ([]*ErrorJSON, error) {
