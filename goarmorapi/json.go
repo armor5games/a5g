@@ -128,6 +128,22 @@ func NewJSONResponse(
 	responsePayload interface{},
 	responseErrorer ResponseErrorer,
 	errs ...*ErrorJSON) (*JSONResponse, error) {
+	publicErrors, err := NewJSONResponseErrors(ctx, responseErrorer, errs...)
+	if err != nil {
+		return nil, err
+	}
+
+	return &JSONResponse{
+		Success: isSuccess,
+		Errors:  publicErrors,
+		Payload: responsePayload,
+		Time:    uint64(time.Now().Unix())}, nil
+}
+
+func NewJSONResponseErrors(
+	ctx context.Context,
+	responseErrorer ResponseErrorer,
+	errs ...*ErrorJSON) ([]*ErrorJSON, error) {
 	config, ok := ctx.Value(CtxKeyConfig).(goarmorconfigs.Configer)
 	if !ok {
 		return nil, errors.New("context.Value fn error")
@@ -179,9 +195,5 @@ func NewJSONResponse(
 		}
 	}
 
-	return &JSONResponse{
-		Success: isSuccess,
-		Errors:  publicErrors,
-		Payload: responsePayload,
-		Time:    uint64(time.Now().Unix())}, nil
+	return publicErrors, nil
 }
