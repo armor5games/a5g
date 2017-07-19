@@ -4,15 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-
-	"github.com/armor5games/goarmor/goarmorapi"
 )
 
 type JSONResponse struct {
 	Error   *JSONError   `json:"error,omitempty"`
 	Payload *JSONPayload `json:"response,omitempty"`
-
-	Errors []*goarmorapi.ErrorJSON `json:",omitempty"`
 }
 
 // JSONError <https://vk.com/dev/payments_errors>.
