@@ -36,6 +36,8 @@ type Config struct {
 		ServerSecretKey string
 		ClientSecretKey string
 
+		GooglePublicKey string
+
 		Bugsnag string
 
 		APITimeoutSeconds uint64
@@ -176,6 +178,12 @@ func (c *Config) DBConfig(t DBConfigType) (
 func (c *Config) SEConfig() (*struct{ UserSecure string }, error) {
 	return &struct{ UserSecure string }{
 		UserSecure: c.Server.ClientSecretKey,
+	}, nil
+}
+
+func (c *Config) GooglePaymentPublicKey() (*struct{ FileName string }, error) {
+	return &struct{ FileName string }{
+		FileName: c.Server.GooglePublicKey,
 	}, nil
 }
 
