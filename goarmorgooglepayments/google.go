@@ -1,4 +1,4 @@
-package goarmorpay
+package goarmorgooglepayments
 
 import (
 	"crypto"
@@ -6,9 +6,9 @@ import (
 	"crypto/sha1"
 	"crypto/x509"
 	"encoding/base64"
-	"fmt"
 	"io/ioutil"
-	"log"
+
+	"github.com/pkg/errors"
 )
 
 type GoogleInappPurchaseData struct {
@@ -21,23 +21,27 @@ type GoogleInappPurchaseData struct {
 	PurchaseToken    string `json:"purchaseToken"`
 }
 
-func DecodePublickey(file string) (*rsa.PublicKey, error) {
+func DecodePublicKey(file string) (*rsa.PublicKey, error) {
 	base64EncodedPublicKey, err := ioutil.ReadFile(file)
 	if err != nil {
-		log.Fatal(fmt.Errorf("Error during open public key file (%s) : %s\n", file, err.Error()))
+		return nil, errors.WithStack(err)
 	}
 
-	decodedPublicKey, err := base64.StdEncoding.DecodeString(string(base64EncodedPublicKey[:]))
+	decodedPublicKey, err := base64.StdEncoding.DecodeString(
+		string(base64EncodedPublicKey[:]))
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode public key")
+		return nil, errors.WithStack(err)
 	}
 
 	publicKeyInterface, err := x509.ParsePKIXPublicKey(decodedPublicKey)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse public key")
+		return nil, errors.WithStack(err)
 	}
 
-	publicKey, _ := publicKeyInterface.(*rsa.PublicKey)
+	publicKey, ok := publicKeyInterface.(*rsa.PublicKey)
+	if !ok {
+		return nil, errors.New("public key is not an *rsa.PublicKey")
+	}
 
 	return publicKey, nil
 }
@@ -52,22 +56,28 @@ func DecodePublickey(file string) (*rsa.PublicKey, error) {
 //    \"purchaseToken\":\"rojeslcdyyiapnqcynkjyyjh\"
 //  }
 
-func GooglePayVerify(publicKey *rsa.PublicKey, signature string, receipt []byte) (cheater bool, err error) {
+func IsValid(publicKey *rsa.PublicKey, signature string, receipt []byte) (
+	bool, error) {
 	// generate hash value from receipt
 	hasher := sha1.New()
-	hasher.Write(receipt)
+
+	if _, err := hasher.Write(receipt); err != nil {
+		return false, errors.WithStack(err)
+	}
+
 	hashedReceipt := hasher.Sum(nil)
 
 	// decode signature
 	decodedSignature, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
-		return false, fmt.Errorf("failed to decode signature")
+		return false, errors.WithStack(err)
 	}
 
 	// verify
-	if err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA1, hashedReceipt, decodedSignature); err != nil {
-		return true, err
+	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA1, hashedReceipt, decodedSignature)
+	if err != nil {
+		return false, errors.WithStack(err)
 	}
 
-	return false, nil
+	return true, nil
 }
