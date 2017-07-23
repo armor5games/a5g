@@ -25,9 +25,9 @@ type JSONResponse struct {
 type ErrorJSON struct {
 	Code uint64
 	// TODO: Rename "Error" to "Err"
-	Error    error             `json:"Message,omitempty"`
-	Public   bool              `json:"-"`
-	Severity ErrorJSONSeverity `json:"-"`
+	Error    error  `json:"Message,omitempty"`
+	Public   bool   `json:"-"`
+	Severity uint64 `json:"-"`
 }
 
 type ErrorJSONSeverity uint64
@@ -39,6 +39,48 @@ const (
 	ErrSeverityError
 	ErrSeverityFatal
 	ErrSeverityPanic
+)
+
+func (s ErrorJSONSeverity) ErrorDefaultCode() uint64 {
+	var c ErrorJSONCode
+
+	switch s {
+	default:
+		return 0
+
+	case ErrSeverityDebug:
+		c = ErrCodeDefautlDebug
+
+	case ErrSeverityInfo:
+		c = ErrCodeDefautlInfo
+
+	case ErrSeverityWarn:
+		c = ErrCodeDefautlWarn
+
+	case ErrSeverityError:
+		c = ErrCodeDefautlError
+
+	case ErrSeverityFatal:
+		c = ErrCodeDefautlFatal
+
+	case ErrSeverityPanic:
+		c = ErrCodeDefautlPanic
+	}
+
+	return uint64(c)
+}
+
+type ErrorJSONCode uint64
+
+const (
+	ErrCodeDefautlDebug ErrorJSONCode = 1100
+	ErrCodeDefautlInfo
+
+	ErrCodeDefautlWarn ErrorJSONCode = 4100
+
+	ErrCodeDefautlError ErrorJSONCode = 5100
+	ErrCodeDefautlFatal
+	ErrCodeDefautlPanic
 )
 
 type ResponseErrorer interface {
@@ -56,7 +98,7 @@ func (e *ErrorJSON) MarshalJSON() ([]byte, error) {
 		Code    uint64
 		Message string `json:",omitempty"`
 	}{
-		Code:    e.Code,
+		Code:    uint64(e.Code),
 		Message: m})
 }
 
@@ -91,7 +133,7 @@ func (j *JSONResponse) KV() (KV, error) {
 	kv := NewKV()
 
 	for _, e := range j.Errors {
-		if e.Code != KVAPIErrorCode {
+		if e.Code != uint64(ErrCodeDefautlDebug) {
 			continue
 		}
 
@@ -178,7 +220,7 @@ func newJSONResponseErrors(
 				continue
 			}
 
-			if x.Code == KVAPIErrorCode {
+			if x.Code == uint64(ErrCodeDefautlDebug) {
 				isKVRemoved = true
 
 				continue
@@ -191,7 +233,7 @@ func newJSONResponseErrors(
 		if isKVRemoved {
 			// Add empty (only with "code") "ErrorJSON" structure in order to be able to
 			// determine was an key-values in hadler's response.
-			publicErrors = append(publicErrors, &ErrorJSON{Code: KVAPIErrorCode})
+			publicErrors = append(publicErrors, &ErrorJSON{Code: uint64(ErrCodeDefautlDebug)})
 		}
 	}
 

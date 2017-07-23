@@ -5,8 +5,6 @@ import (
 	"strings"
 )
 
-const KVAPIErrorCode = 1100
-
 // KV is an key-values
 type KV map[string]interface{}
 
@@ -57,7 +55,7 @@ func (keyValues KV) ResponseErrors() []*ErrorJSON {
 
 	for k, v := range keyValues {
 		e = append(e, &ErrorJSON{
-			Code: KVAPIErrorCode, Error: fmt.Errorf("%s:%s", k, v)})
+			Code: uint64(ErrCodeDefautlDebug), Error: fmt.Errorf("%s:%s", k, v)})
 	}
 
 	return e
