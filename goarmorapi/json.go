@@ -75,8 +75,7 @@ type ErrorJSONCode uint64
 const (
 	ErrCodeDefautlDebug ErrorJSONCode = 1100
 	ErrCodeDefautlInfo
-
-	ErrCodeDefautlWarn ErrorJSONCode = 4100
+	ErrCodeDefautlWarn
 
 	ErrCodeDefautlError ErrorJSONCode = 5100
 	ErrCodeDefautlFatal
