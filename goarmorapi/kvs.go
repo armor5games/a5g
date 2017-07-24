@@ -5,6 +5,13 @@ import "fmt"
 // KVS is an key and values of type string
 type KVS map[string]string
 
+type KVSValueBoolean string
+
+const (
+	KVSValBoolTrue  KVSValueBoolean = "true"
+	KVSValBoolFalse KVSValueBoolean = "false"
+)
+
 func NewKVS() KVS {
 	return newKVS(nil)
 }
