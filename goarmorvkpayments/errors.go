@@ -33,4 +33,9 @@ var (
 		Code:     22,
 		Critical: true,
 		Err:      errors.New("user does not exist")}
+
+	ErrUnknownInternalServerError = JSONError{
+		Code:     100,
+		Critical: true,
+		Err:      errors.New("unknown internal server error")}
 )
