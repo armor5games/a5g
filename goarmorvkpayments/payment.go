@@ -23,29 +23,58 @@ type VKAPIPayment struct {
 	Signature int64 `json:"signature"`
 }
 
-// PaymentNotificationType allowable values for VKAPIPayment.NotificationType
-type PaymentNotificationType string
+// VKAPIPaymentNotificationType allowable values for VKAPIPayment.NotificationType
+type VKAPIPaymentNotificationType string
 
 const (
-	// PaymentNotificationTypeGetItem получение информации о товаре.
-	PaymentNotificationTypeGetItem PaymentNotificationType = "get_item"
+	// VKAPIPaymentNotificationTypeGetItem получение информации о товаре.
+	VKAPIPaymentNotificationTypeGetItem     VKAPIPaymentNotificationType = "get_item"
+	VKAPIPaymentNotificationTypeGetItemTest VKAPIPaymentNotificationType = "get_item_test"
 
-	// PaymentNotificationTypeOrderStatusChange изменение статуса заказа.
-	PaymentNotificationTypeOrderStatusChange PaymentNotificationType = "order_status_change"
+	// VKAPIPaymentNotificationTypeOrderStatusChange изменение статуса заказа.
+	VKAPIPaymentNotificationTypeOrderStatusChange     VKAPIPaymentNotificationType = "order_status_change"
+	VKAPIPaymentNotificationTypeOrderStatusChangeTest VKAPIPaymentNotificationType = "order_status_change_test"
 
-	// PaymentNotificationTypeGetSubscription получение информации о подписке.
-	PaymentNotificationTypeGetSubscription PaymentNotificationType = "get_subscription"
+	// VKAPIPaymentNotificationTypeGetSubscription получение информации о подписке.
+	VKAPIPaymentNotificationTypeGetSubscription VKAPIPaymentNotificationType = "get_subscription"
 
-	// PaymentNotificationTypeSubscriptionStatusChange изменение статуса подписки.
-	PaymentNotificationTypeSubscriptionStatusChange PaymentNotificationType = "subscription_status_change"
+	// VKAPIPaymentNotificationTypeSubscriptionStatusChange изменение статуса подписки.
+	VKAPIPaymentNotificationTypeSubscriptionStatusChange VKAPIPaymentNotificationType = "subscription_status_change"
 )
 
-func (t PaymentNotificationType) String() string {
+func (t VKAPIPaymentNotificationType) String() string {
 	return string(t)
 }
 
-// VKAPIPaymentOrderStatusChange <https://vk.com/dev/payments_status>.
-type VKAPIPaymentOrderStatusChange struct {
+// VKAPIPaymentInfo <https://vk.com/dev/payments_getitem>.
+type VKAPIPaymentInfo struct {
+	VKAPIPayment
+
+	// Language (lang) язык пользователя в формате язык_страна.
+	// На данный момент поддерживается 4 языка.
+	Language string `json:"language"`
+
+	// Item наименование товара, переданное диалоговому окну покупки
+	// (см. Параметры диалогового окна платежей)
+	Item string `json:"item"`
+}
+
+// VKAPIPaymentInfoLanguage allowable languages for VKAPIPaymentInfo.Language
+type VKAPIPaymentInfoLanguage string
+
+const (
+	VKAPIPaymentInfoLanguageRURU VKAPIPaymentInfoLanguage = "ru_RU"
+	VKAPIPaymentInfoLanguageUKUA VKAPIPaymentInfoLanguage = "uk_UA"
+	VKAPIPaymentInfoLanguageBEBY VKAPIPaymentInfoLanguage = "be_BY"
+	VKAPIPaymentInfoLanguageENUS VKAPIPaymentInfoLanguage = "en_US"
+)
+
+func (t VKAPIPaymentInfoLanguage) String() string {
+	return string(t)
+}
+
+// VKAPIPaymentOrderStatus <https://vk.com/dev/payments_status>.
+type VKAPIPaymentOrderStatus struct {
 	VKAPIPayment
 
 	// Date дата создания заказа (в формате Unixtime).

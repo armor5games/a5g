@@ -9,7 +9,7 @@ var (
 		Critical: false,
 		Err:      errors.New("temporary database error")}
 
-	ErrSignatureMismatc = JSONError{
+	ErrSignatureMismatch = JSONError{
 		Code:     10,
 		Critical: true,
 		Err:      errors.New("mismatching of the calculated and transmitted signature")}
@@ -38,4 +38,9 @@ var (
 		Code:     100,
 		Critical: true,
 		Err:      errors.New("unknown internal server error")}
+
+	ErrUnsupportedPaymentNotificationType = JSONError{
+		Code:     101,
+		Critical: true,
+		Err:      errors.New("unsupported payment notification type")}
 )
