@@ -1,5 +1,17 @@
 package goarmorvkpayments
 
+import (
+	"strconv"
+	"strings"
+
+	"github.com/pkg/errors"
+)
+
+var (
+	ErrVKAPIPaymentUnexpectedNotificationType = errors.New(`unexpected vk payment's "notification_type"`)
+	ErrVKAPIPaymentItemEmpty                  = errors.New(`empty vk payment's "item"`)
+)
+
 // VKAPIPayment <https://vk.com/dev/payments_callbacks>.
 type VKAPIPayment struct {
 	// NotificationType (notification_type) тип уведомления.
@@ -20,7 +32,7 @@ type VKAPIPayment struct {
 	OrderID int64 `json:"orderID"`
 
 	// Signature (sig) подпись уведомления (см. подробнее в разделе 3. Проверка подписи уведомления).
-	Signature int64 `json:"signature"`
+	Signature string `json:"signature"`
 }
 
 // VKAPIPaymentNotificationType allowable values for VKAPIPayment.NotificationType
@@ -46,61 +58,107 @@ func (t VKAPIPaymentNotificationType) String() string {
 	return string(t)
 }
 
-// VKAPIPaymentInfo <https://vk.com/dev/payments_getitem>.
-type VKAPIPaymentInfo struct {
-	VKAPIPayment
+func (p *VKAPIPayment) Validate() error {
+	switch VKAPIPaymentNotificationType(p.NotificationType) {
+	default:
+		return ErrVKAPIPaymentUnexpectedNotificationType
+	case
+		VKAPIPaymentNotificationTypeGetItem,
+		VKAPIPaymentNotificationTypeGetItemTest,
+		VKAPIPaymentNotificationTypeOrderStatusChange,
+		VKAPIPaymentNotificationTypeOrderStatusChangeTest,
+		VKAPIPaymentNotificationTypeGetSubscription,
+		VKAPIPaymentNotificationTypeSubscriptionStatusChange:
+	}
 
-	// Language (lang) язык пользователя в формате язык_страна.
-	// На данный момент поддерживается 4 языка.
-	Language string `json:"language"`
+	if p.AppID < 0 {
+		return errors.New(`unexpected vk payment's "app_id"`)
+	}
 
-	// Item наименование товара, переданное диалоговому окну покупки
-	// (см. Параметры диалогового окна платежей)
-	Item string `json:"item"`
+	if p.UserID < 0 {
+		return errors.New(`unexpected vk payment's "user_id"`)
+	}
+
+	if p.ReceiverID == 0 {
+		return errors.New(`unexpected vk payment's "receiver_id"`)
+	}
+
+	if p.OrderID < 0 {
+		return errors.New(`unexpected vk payment's "order_id"`)
+	}
+
+	if strings.TrimSpace(p.Signature) == "" {
+		return errors.New("empty vk payment's signature (sig)")
+	}
+
+	return nil
 }
 
-// VKAPIPaymentInfoLanguage allowable languages for VKAPIPaymentInfo.Language
-type VKAPIPaymentInfoLanguage string
+func (kv VKAPIKV) kvAPIPayment() (VKAPIPayment, error) {
+	var p VKAPIPayment
 
-const (
-	VKAPIPaymentInfoLanguageRURU VKAPIPaymentInfoLanguage = "ru_RU"
-	VKAPIPaymentInfoLanguageUKUA VKAPIPaymentInfoLanguage = "uk_UA"
-	VKAPIPaymentInfoLanguageBEBY VKAPIPaymentInfoLanguage = "be_BY"
-	VKAPIPaymentInfoLanguageENUS VKAPIPaymentInfoLanguage = "en_US"
-)
+	var (
+		i   int64
+		err error
+	)
 
-func (t VKAPIPaymentInfoLanguage) String() string {
-	return string(t)
+	for k, v := range kv {
+		switch k {
+		case "notification_type":
+			p.NotificationType = v
+
+		case "app_id":
+			i, err = strconv.ParseInt(v, 10, 64)
+			if err != nil {
+				return p, errors.WithStack(err)
+			}
+			p.AppID = i
+
+		case "user_id":
+			i, err = strconv.ParseInt(v, 10, 64)
+			if err != nil {
+				return p, errors.WithStack(err)
+			}
+			p.UserID = i
+
+		case "receiver_id":
+			i, err = strconv.ParseInt(v, 10, 64)
+			if err != nil {
+				return p, errors.WithStack(err)
+			}
+			p.ReceiverID = i
+
+		case "order_id":
+			i, err = strconv.ParseInt(v, 10, 64)
+			if err != nil {
+				return p, errors.WithStack(err)
+			}
+			p.OrderID = i
+
+		case "sig":
+			p.Signature = v
+		}
+	}
+
+	return p, nil
 }
 
-// VKAPIPaymentOrderStatus <https://vk.com/dev/payments_status>.
-type VKAPIPaymentOrderStatus struct {
-	VKAPIPayment
-
-	// Date дата создания заказа (в формате Unixtime).
-	Date int64 `json:"date"`
-
-	// Status новый статус заказа.
-	// Возможные значения:
-	// chargeable — заказ готов к оплате. Необходимо оформить заказ
-	// пользователю внутри приложения. В случае ответа об успехе
-	// платёжная система зачислит голоса на счёт приложения. Если в
-	// ответ будет получено сообщение об ошибке, заказ отменяется.
-	Status string `json:"status"`
-
-	// Item наименование товара, переданное диалоговому окну покупки
-	// (см. Параметры диалогового окна платежей)
-	Item string `json:"item"`
-
-	// ItemID (item_id) идентификатор товара в приложении.
-	ItemID int64 `json:"itemID"`
-
-	// ItemTitle (item_title) название товара.
-	ItemTitle string `json:"itemTitle"`
-
-	// ItemPhotoURL (item_photo_url) string изображение товара.
-	ItemPhotoURL string `json:"itemPhotoURL"`
-
-	// ItemPrice (item_price) стоимость товара.
-	ItemPrice string `json:"itemPrice"`
-}
+// func (p *VKAPIPayment) setFieldInt64(fieldName, fieldValue string) error {
+// 	i, err := strconv.ParseInt(fieldValue, 10, 64)
+// 	if err != nil {
+// 		return errors.WithStack(err)
+// 	}
+// 	switch fieldName {
+// 	default:
+// 		return ErrVKAPIPaymentUnknownFieldName
+// 	case "app_id":
+// 		p.AppID = i
+// 	case "user_id":
+// 		p.UserID = i
+// 	case "receiver_id":
+// 		p.ReceiverID = i
+// 	case "order_id":
+// 		p.OrderID = i
+// 	}
+// 	return nil
+// }
