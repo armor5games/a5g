@@ -2,6 +2,7 @@ package goarmorvkpayments
 
 import (
 	"net/url"
+	"strings"
 
 	"github.com/armor5games/goarmor/goarmorapi"
 	"github.com/pkg/errors"
@@ -58,6 +59,30 @@ func (keyValues VKAPIKV) Validate() error {
 			"status":
 			// VKAPIPaymentOrder.
 		}
+	}
+
+	if strings.TrimSpace(keyValues["app_id"]) == "" {
+		return errors.New(`empty vk payment's "app_id"`)
+	}
+
+	if strings.TrimSpace(keyValues["notification_type"]) == "" {
+		return errors.New(`empty vk payment's "notification_type"`)
+	}
+
+	if strings.TrimSpace(keyValues["order_id"]) == "" {
+		return errors.New(`empty vk payment's "order_id"`)
+	}
+
+	if strings.TrimSpace(keyValues["receiver_id"]) == "" {
+		return errors.New(`empty vk payment's "receiver_id"`)
+	}
+
+	if strings.TrimSpace(keyValues["sig"]) == "" {
+		return errors.New(`empty vk payment's "sig"`)
+	}
+
+	if strings.TrimSpace(keyValues["user_id"]) == "" {
+		return errors.New(`empty vk payment's "user_id"`)
 	}
 
 	return nil
