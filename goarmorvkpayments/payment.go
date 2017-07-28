@@ -67,6 +67,8 @@ func (t VKAPIPaymentNotificationType) Validate() error {
 		VKAPIPaymentNotificationTypeOrderStatusChangeTest,
 		VKAPIPaymentNotificationTypeGetSubscription,
 		VKAPIPaymentNotificationTypeSubscriptionStatusChange:
+
+		return nil
 	}
 
 	return ErrVKAPIPaymentUnexpectedNotificationType
