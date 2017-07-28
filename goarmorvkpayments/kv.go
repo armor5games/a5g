@@ -85,6 +85,11 @@ func (keyValues VKAPIKV) Validate() error {
 		return errors.New(`empty vk payment's "user_id"`)
 	}
 
+	err := VKAPIPaymentNotificationType(keyValues["notification_type"]).Validate()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
 	return nil
 }
 
