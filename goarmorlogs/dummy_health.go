@@ -8,7 +8,7 @@ import (
 )
 
 type DummyHealth struct {
-	Logger *logrus.Logger
+	Logger *logrus.Logger `json:"logger"`
 }
 
 func NewDummyHealth(l *logrus.Logger) *DummyHealth {

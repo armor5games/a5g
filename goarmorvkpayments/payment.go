@@ -19,17 +19,17 @@ type VKAPIPayment struct {
 	NotificationType string `json:"notificationType"`
 
 	// AppID (app_id) идентификатор приложения.
-	AppID int64 `json:"appID"`
+	AppID int64 `json:"appId"`
 
 	// UserID (user_id) идентификатор пользователя, сделавшего заказ.
-	UserID int64 `json:"userID"`
+	UserID int64 `json:"userId"`
 
 	// ReceiverID (receiver_id) идентификатор получателя заказа
 	// (в данный момент совпадает с user_id, но в будущем может отличаться).
-	ReceiverID int64 `json:"receiverID"`
+	ReceiverID int64 `json:"receiverId"`
 
 	// OrderID (order_id) идентификатор заказа в системе платежей ВКонтакте.
-	OrderID int64 `json:"orderID"`
+	OrderID int64 `json:"orderId"`
 
 	// Signature (sig) подпись уведомления (см. подробнее в разделе 3. Проверка подписи уведомления).
 	Signature string `json:"signature"`

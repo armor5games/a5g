@@ -11,21 +11,21 @@ import (
 )
 
 type JSONRequest struct {
-	Payload interface{} `json:",omitempty"`
-	Time    uint64      `json:",omitempty"`
+	Payload interface{} `json:"payload,omitempty"`
+	Time    uint64      `json:"time,omitempty"`
 }
 
 type JSONResponse struct {
-	Success bool
-	Errors  []*ErrorJSON `json:",omitempty"`
-	Payload interface{}  `json:",omitempty"`
-	Time    uint64       `json:",omitempty"`
+	Success bool         `json:"success,omitempty"`
+	Errors  []*ErrorJSON `json:"errors,omitempty"`
+	Payload interface{}  `json:"payload,omitempty"`
+	Time    uint64       `json:"time,omitempty"`
 }
 
 type ErrorJSON struct {
 	Code uint64
 	// TODO: Rename "Error" to "Err"
-	Error    error  `json:"Message,omitempty"`
+	Error    error  `json:"message,omitempty"`
 	Public   bool   `json:"-"`
 	Severity uint64 `json:"-"`
 }
@@ -94,8 +94,8 @@ func (e *ErrorJSON) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(&struct {
-		Code    uint64
-		Message string `json:",omitempty"`
+		Code    uint64 `json:"code,omitempty"`
+		Message string `json:"message,omitempty"`
 	}{
 		Code:    uint64(e.Code),
 		Message: m})
@@ -103,8 +103,8 @@ func (e *ErrorJSON) MarshalJSON() ([]byte, error) {
 
 func (e *ErrorJSON) UnmarshalJSON(b []byte) error {
 	s := &struct {
-		Code    uint64
-		Message string
+		Code    uint64 `json:"code"`
+		Message string `json:"message"`
 	}{}
 
 	if err := json.Unmarshal(b, &s); err != nil {

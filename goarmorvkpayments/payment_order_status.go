@@ -29,13 +29,13 @@ type VKAPIPaymentOrder struct {
 	Item string `json:"item"`
 
 	// ItemID (item_id) идентификатор товара в приложении.
-	ItemID int64 `json:"itemID"`
+	ItemID int64 `json:"itemId"`
 
 	// ItemTitle (item_title) название товара.
 	ItemTitle string `json:"itemTitle"`
 
 	// ItemPhotoURL (item_photo_url) string изображение товара.
-	ItemPhotoURL string `json:"itemPhotoURL"`
+	ItemPhotoURL string `json:"itemPhotoUrl"`
 
 	// ItemPrice (item_price) стоимость товара.
 	ItemPrice string `json:"itemPrice"`

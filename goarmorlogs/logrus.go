@@ -16,7 +16,7 @@ func NewStructuredLogger(logger *logrus.Logger) func(next http.Handler) http.Han
 }
 
 type StructuredLogger struct {
-	Logger *logrus.Logger
+	Logger *logrus.Logger `json:"logger"`
 }
 
 func (l *StructuredLogger) NewLogEntry(r *http.Request) middleware.LogEntry {
@@ -50,7 +50,7 @@ func (l *StructuredLogger) NewLogEntry(r *http.Request) middleware.LogEntry {
 }
 
 type StructuredLoggerEntry struct {
-	Logger logrus.FieldLogger
+	Logger logrus.FieldLogger `json:"logger"`
 }
 
 func (l *StructuredLoggerEntry) Write(status, bytes int, elapsed time.Duration) {
