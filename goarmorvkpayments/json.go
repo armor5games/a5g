@@ -6,6 +6,11 @@ import (
 	"fmt"
 )
 
+type JSONResponse struct {
+	Error   *JSONError  `json:"error,omitempty"`
+	Payload interface{} `json:"response,omitempty"`
+}
+
 // JSONError <https://vk.com/dev/payments_errors>.
 type JSONError struct {
 	Code     uint64 `json:"error_code"`
