@@ -48,6 +48,10 @@ const (
 	VKAPIPaymentOrderStatusChargeable VKAPIPaymentOrderStatus = "chargeable"
 )
 
+func (s VKAPIPaymentOrderStatus) String() string {
+	return string(s)
+}
+
 func (p *VKAPIPaymentOrder) Validate() error {
 	err := p.VKAPIPayment.Validate()
 	if err != nil {
