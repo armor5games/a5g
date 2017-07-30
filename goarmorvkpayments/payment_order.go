@@ -29,7 +29,7 @@ type VKAPIPaymentOrder struct {
 	Item string `json:"item"`
 
 	// ItemID (item_id) идентификатор товара в приложении.
-	ItemID int64 `json:"itemId"`
+	ItemID string `json:"itemId"`
 
 	// ItemTitle (item_title) название товара.
 	ItemTitle string `json:"itemTitle"`
@@ -80,8 +80,8 @@ func (p *VKAPIPaymentOrder) Validate() error {
 		return ErrVKAPIPaymentItemEmpty
 	}
 
-	if p.ItemID < 1 {
-		return errors.New(`unexpected vk payment's "item_id"`)
+	if strings.TrimSpace(p.ItemID) == "" {
+		return errors.New(`empty vk payment's "item_id"`)
 	}
 
 	if strings.TrimSpace(p.ItemTitle) == "" {
@@ -125,11 +125,7 @@ func (kv VKAPIKV) VKAPIPaymentOrder() (*VKAPIPaymentOrder, error) {
 			paymentOrderStatus.Item = v
 
 		case "item_id":
-			i, err = strconv.ParseInt(v, 10, 64)
-			if err != nil {
-				return nil, errors.WithStack(err)
-			}
-			paymentOrderStatus.ItemID = i
+			paymentOrderStatus.ItemID = v
 
 		case "item_title":
 			paymentOrderStatus.ItemTitle = v
