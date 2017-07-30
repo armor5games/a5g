@@ -21,7 +21,7 @@ type JSONSuccessInfo struct {
 	// разработчика. Рекомендуемый размер изображения – 75х75px.
 	PhotoURL string `json:"photo_url,omitempty"`
 	// Price vk description: стоимость товара в голосах.
-	Price uint64 `json:"price"`
+	Price int64 `json:"price"`
 	// ItemID vk description: идентификатор товара в приложении.
 	ItemID string `json:"item_id,omitempty"`
 	// Expiration vk description: разрешает кэширование товара на
@@ -30,14 +30,18 @@ type JSONSuccessInfo struct {
 	// 3600 секунд при большом количестве подряд одинаковых ответов. Для
 	// отмены кэширования необходимо передать 0 в качестве значения
 	// параметра.
-	Expiration uint64 `json:"expiration"`
+	Expiration int64 `json:"expiration"`
 }
+
+type JSONSuccessInfoExpiration int64
+
+const JSONSuccessInfoExpirationNoCache JSONSuccessInfoExpiration = 0
 
 // JSONSuccessOrder <https://vk.com/dev/payments_status>.
 type JSONSuccessOrder struct {
 	// OrderID, vk description: required идентификатор заказа в системе
 	// платежей ВКонтакте.
-	OrderID uint64 `json:"order_id"`
+	OrderID int64 `json:"order_id"`
 	// AppOrderID vk description: идентификатор заказа в приложении.
 	// Должен быть уникальным для каждого заказа.
 	AppOrderID int64 `json:"app_order_id,omitempty"`
