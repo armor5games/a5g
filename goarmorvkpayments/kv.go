@@ -85,8 +85,18 @@ func (keyValues VKAPIKV) Validate() error {
 		return errors.New(`empty vk payment's "user_id"`)
 	}
 
+	err := VKAPIPaymentNotificationType(keyValues["notification_type"]).Validate()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
 	return nil
 }
+
+func (m VKAPIKV) Item() string             { return m["item"] }
+func (m VKAPIKV) NotificationType() string { return m["notification_type"] }
+func (m VKAPIKV) OrderID() string          { return m["order_id"] }
+func (m VKAPIKV) Sig() string              { return m["sig"] }
 
 func (keyValues VKAPIKV) KV() goarmorapi.KV {
 	kv := make(goarmorapi.KV)

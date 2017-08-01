@@ -58,10 +58,8 @@ func (t VKAPIPaymentNotificationType) String() string {
 	return string(t)
 }
 
-func (p *VKAPIPayment) Validate() error {
-	switch VKAPIPaymentNotificationType(p.NotificationType) {
-	default:
-		return ErrVKAPIPaymentUnexpectedNotificationType
+func (t VKAPIPaymentNotificationType) Validate() error {
+	switch t {
 	case
 		VKAPIPaymentNotificationTypeGetItem,
 		VKAPIPaymentNotificationTypeGetItemTest,
@@ -69,6 +67,17 @@ func (p *VKAPIPayment) Validate() error {
 		VKAPIPaymentNotificationTypeOrderStatusChangeTest,
 		VKAPIPaymentNotificationTypeGetSubscription,
 		VKAPIPaymentNotificationTypeSubscriptionStatusChange:
+
+		return nil
+	}
+
+	return ErrVKAPIPaymentUnexpectedNotificationType
+}
+
+func (p *VKAPIPayment) Validate() error {
+	err := VKAPIPaymentNotificationType(p.NotificationType).Validate()
+	if err != nil {
+		return errors.WithStack(err)
 	}
 
 	if p.AppID < 0 {

@@ -7,8 +7,8 @@ import (
 )
 
 type JSONResponse struct {
-	Error   *JSONError   `json:"error,omitempty"`
-	Payload *JSONPayload `json:"response,omitempty"`
+	Error   *JSONError  `json:"error,omitempty"`
+	Payload interface{} `json:"response,omitempty"`
 }
 
 // JSONError <https://vk.com/dev/payments_errors>.
@@ -18,12 +18,38 @@ type JSONError struct {
 	Critical bool   `json:"critical"`
 }
 
-// JSONPayload <https://vk.com/dev/payments_getitem>,
-// <https://vk.com/dev/payments_status>.
-type JSONPayload struct {
-	Title    string `json:"title,omitempty"`
+// JSONSuccessInfo <https://vk.com/dev/payments_getitem>.
+type JSONSuccessInfo struct {
+	// Title vk description: название товара, до 48 символов
+	Title string `json:"title"`
+	// PhotoURL vk description: URL изображения товара на сервере
+	// разработчика. Рекомендуемый размер изображения – 75х75px.
 	PhotoURL string `json:"photo_url,omitempty"`
-	Price    uint64 `json:"price,omitempty"`
+	// Price vk description: стоимость товара в голосах.
+	Price int64 `json:"price"`
+	// ItemID vk description: идентификатор товара в приложении.
+	ItemID string `json:"item_id,omitempty"`
+	// Expiration vk description: разрешает кэширование товара на
+	// {expiration} секунд. Допустимый диапазон от 600 до 604800 секунд.
+	// Внимание! При отсутствии параметра возможно кэширование товара на
+	// 3600 секунд при большом количестве подряд одинаковых ответов. Для
+	// отмены кэширования необходимо передать 0 в качестве значения
+	// параметра.
+	Expiration int64 `json:"expiration"`
+}
+
+type JSONSuccessInfoExpiration int64
+
+const JSONSuccessInfoExpirationNoCache JSONSuccessInfoExpiration = 0
+
+// JSONSuccessOrder <https://vk.com/dev/payments_status>.
+type JSONSuccessOrder struct {
+	// OrderID, vk description: required идентификатор заказа в системе
+	// платежей ВКонтакте.
+	OrderID int64 `json:"order_id"`
+	// AppOrderID vk description: идентификатор заказа в приложении.
+	// Должен быть уникальным для каждого заказа.
+	AppOrderID int64 `json:"app_order_id,omitempty"`
 }
 
 func (e *JSONError) Error() string {
