@@ -16,14 +16,15 @@ import (
 )
 
 type SessionLoginPayload struct {
-	UserID            uint64 `json:"userId,omitempty"`
-	UserDataVersion   uint64 `json:"userDataVersion,omitempty"`
-	AccessToken       string `json:"accessToken,omitempty"`
-	AccessExpiresAt   uint64 `json:"accessExpiresAt,omitempty"`
-	ShardURL          string `json:"shardUrl,omitempty"`
-	StaticDataVersion uint64 `json:"staticDataVersion,omitempty"`
-	UserName          string `json:"userName,omitempty"`
-	NewUser           bool   `json:"newUser"`
+	UserID               uint64 `json:"userId,omitempty"`
+	UserDataVersion      uint64 `json:"userDataVersion,omitempty"`
+	AccessToken          string `json:"accessToken,omitempty"`
+	AccessExpiresAt      uint64 `json:"accessExpiresAt,omitempty"`
+	ShardURL             string `json:"shardUrl,omitempty"`
+	StaticDataVersion    uint64 `json:"staticDataVersion,omitempty"`
+	UserName             string `json:"userName,omitempty"`
+	UserNameChangesCount uint64 `json:"userNameChangeCount,omitempty"`
+	NewUser              bool   `json:"newUser"`
 }
 
 type SessionShardResponse struct {
