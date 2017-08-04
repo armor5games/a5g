@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/armor5games/goarmor/goarmorapi"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -11,8 +12,12 @@ type DummyHealth struct {
 	Logger *logrus.Logger `json:"logger"`
 }
 
-func NewDummyHealth(l *logrus.Logger) *DummyHealth {
-	return &DummyHealth{Logger: l}
+func NewDummyHealth(l *logrus.Logger) (*DummyHealth, error) {
+	if l == nil {
+		return nil, errors.New("nil pointer")
+	}
+
+	return &DummyHealth{Logger: l}, nil
 }
 
 func (l *DummyHealth) Event(eventName string) {
