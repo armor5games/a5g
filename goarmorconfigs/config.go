@@ -1,10 +1,10 @@
 package goarmorconfigs
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 
+	"github.com/pkg/errors"
 	"gopkg.in/gcfg.v1"
 )
 
@@ -15,10 +15,15 @@ const (
 	DBRead DBConfigType = iota
 	DBWrite
 	DBReadStatic
+
+	MongoDBClientMetrics MongoDBConfigType = iota
 )
 
-type ServerType int
-type DBConfigType int
+type (
+	ServerType        int
+	DBConfigType      int
+	MongoDBConfigType int
+)
 
 type Config struct {
 	PathToConfig string
@@ -61,6 +66,9 @@ type Config struct {
 		RStaticDBHost string
 		RStaticDBPass string
 		RStaticDBPort string
+
+		MongoDBHost string
+		MongoDBName string
 	}
 
 	ShardServer struct {
@@ -169,6 +177,24 @@ func (c *Config) DBConfig(t DBConfigType) (
 				DBHost: c.ShardServer.WDBHost,
 				DBPass: c.ShardServer.WDBPass,
 				DBPort: c.ShardServer.WDBPort}, nil
+		}
+	}
+
+	return nil, fmt.Errorf("unknown server type: %s", string(c.Server.Type))
+}
+
+func (c *Config) MongoDBConfig(t MongoDBConfigType) (
+	*struct{ MongoDBHost, MongoDBName string }, error) {
+	if c.Server.Type == TypeLogin {
+		switch t {
+		default:
+			return nil, errors.Errorf("unknown login server mongodb config type: %s",
+				string(t))
+
+		case MongoDBClientMetrics:
+			return &struct{ MongoDBHost, MongoDBName string }{
+				MongoDBHost: c.LoginServer.MongoDBHost,
+				MongoDBName: c.LoginServer.MongoDBName}, nil
 		}
 	}
 
