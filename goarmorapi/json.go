@@ -16,7 +16,7 @@ type JSONRequest struct {
 }
 
 type JSONResponse struct {
-	Success bool         `json:"success,omitempty"`
+	Success bool         `json:"success"`
 	Errors  []*ErrorJSON `json:"messages,omitempty"`
 	Payload interface{}  `json:"payload,omitempty"`
 	Time    uint64       `json:"time,omitempty"`
