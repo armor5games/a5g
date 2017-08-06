@@ -41,8 +41,6 @@ type Config struct {
 		ServerSecretKey string
 		ClientSecretKey string
 
-		GooglePublicKey string
-
 		Bugsnag string
 
 		APITimeoutSeconds uint64
@@ -83,6 +81,12 @@ type Config struct {
 		WDBHost string
 		WDBPass string
 		WDBPort string
+	}
+
+	Google struct {
+		// AppLicenseKey
+		// <https://developer.android.com/google/play/billing/billing_integrate.html#billing-security>.
+		AppLicenseKey string
 	}
 
 	Static struct {
@@ -204,12 +208,6 @@ func (c *Config) MongoDBConfig(t MongoDBConfigType) (
 func (c *Config) SEConfig() (*struct{ UserSecure string }, error) {
 	return &struct{ UserSecure string }{
 		UserSecure: c.Server.ClientSecretKey,
-	}, nil
-}
-
-func (c *Config) GooglePaymentPublicKey() (*struct{ FileName string }, error) {
-	return &struct{ FileName string }{
-		FileName: c.Server.GooglePublicKey,
 	}, nil
 }
 
