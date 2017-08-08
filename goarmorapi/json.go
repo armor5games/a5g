@@ -33,7 +33,8 @@ type ErrorJSON struct {
 type ErrorJSONSeverity uint64
 
 const (
-	ErrSeverityDebug ErrorJSONSeverity = iota
+	ErrSeverityUnknown ErrorJSONSeverity = iota
+	ErrSeverityDebug
 	ErrSeverityInfo
 	ErrSeverityWarn
 	ErrSeverityError
