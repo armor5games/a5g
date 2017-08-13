@@ -211,6 +211,6 @@ func (c *Config) SEConfig() (*struct{ UserSecure string }, error) {
 	}, nil
 }
 
-func (c *Config) StaticStorage() (string, error) {
+func (c *Config) StaticsDir() (string, error) {
 	return c.Static.Directory, nil
 }
