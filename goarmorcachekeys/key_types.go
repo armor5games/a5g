@@ -8,6 +8,10 @@ import (
 type KeyType int
 
 func (t KeyType) Sprint(a ...interface{}) string {
+	if len(a) == 0 {
+		return fmt.Sprintf("%d", t)
+	}
+
 	var b bytes.Buffer
 
 	for _, v := range a {
