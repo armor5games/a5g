@@ -14,5 +14,5 @@ func (t KeyType) Sprint(a ...interface{}) string {
 		b.WriteString(fmt.Sprint(v))
 	}
 
-	return fmt.Sprintf("%d%v", t, b.String())
+	return fmt.Sprintf("%d%s", t, b.String())
 }
