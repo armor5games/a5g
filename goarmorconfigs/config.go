@@ -129,6 +129,7 @@ func New(
 	return c, nil
 }
 
+// FIXME: Remove me!
 func (c *Config) DBConfig(t DBConfigType) (
 	*struct{ DBUser, DBPass, DBHost, DBPort, DBName string }, error) {
 	if c.Server.Type == TypeLogin {
