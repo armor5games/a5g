@@ -3,8 +3,6 @@ package goarmorapi
 import (
 	"context"
 	"encoding/json"
-	"errors"
-	"fmt"
 	"io/ioutil"
 	"mime"
 	"net/http"
@@ -12,6 +10,7 @@ import (
 
 	"github.com/armor5games/goarmor/goarmorchecksums"
 	"github.com/armor5games/goarmor/goarmorconfigs"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -74,7 +73,7 @@ func NewSession(ctx context.Context, requestToShard *http.Request) (
 
 	httpBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return nil, fmt.Errorf("ioutil.ReadAll fn error: %s", err.Error())
+		return nil, errors.Wrap(err, "ioutil.ReadAll fn")
 	}
 
 	kv := NewKV()
@@ -89,7 +88,7 @@ func NewSession(ctx context.Context, requestToShard *http.Request) (
 
 	t, _, err := mime.ParseMediaType(res.Header.Get("Content-type"))
 	if err != nil {
-		return nil, fmt.Errorf("mime.ParseMediaType fn error: %s", err.Error())
+		return nil, errors.Wrap(err, "mime.ParseMediaType fn")
 	}
 
 	if t != "application/json" {
@@ -104,7 +103,7 @@ func NewSession(ctx context.Context, requestToShard *http.Request) (
 	shardResponse := new(SessionShardResponse)
 	err = json.Unmarshal(httpBody, shardResponse)
 	if err != nil {
-		return nil, fmt.Errorf("json.Unmarshal fn error: %s", err.Error())
+		return nil, errors.Wrap(err, "json.Unmarshal fn")
 	}
 
 	if !shardResponse.Success {
@@ -146,9 +145,8 @@ func NewSession(ctx context.Context, requestToShard *http.Request) (
 
 	accessTokenChecksum, err :=
 		goarmorchecksums.New([]byte(accessToken), config.Server.ServerSecretKey)
-	if shardResponse.Payload.AccessTokenChecksum != accessTokenChecksum {
-		err = fmt.Errorf("gameserverconfigs.(*Config)NewDummyChecksum fn: %s",
-			err.Error())
+	if err != nil {
+		err = errors.WithStack(err)
 
 		l.WithFields(logrus.Fields(kv)).Error(err.Error())
 
@@ -157,8 +155,8 @@ func NewSession(ctx context.Context, requestToShard *http.Request) (
 
 	kv["accessTokenChecksum"] = accessTokenChecksum
 
-	if shardResponse.Payload.AccessTokenChecksum != accessTokenChecksum {
-		err = errors.New("AccessToken and AccessTokenChecksum mismatch")
+	if shardResponse.Payload.AccessTokenChecksum != string(accessTokenChecksum) {
+		err = errors.New("access token and access token's checksum mismatch")
 
 		l.WithFields(logrus.Fields(kv)).Error(err.Error())
 

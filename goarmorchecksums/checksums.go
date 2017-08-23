@@ -1,35 +1,65 @@
 package goarmorchecksums
 
 import (
+	"bytes"
 	"crypto/md5"
-	"errors"
-	"fmt"
+
+	"github.com/pkg/errors"
 )
 
-func New(payload []byte, secretKey string) (string, error) {
+var (
+	ErrPayloadEmpty   = errors.New("empty payload")
+	ErrSecretKeyEmpty = errors.New("empty secret key")
+)
+
+func New(toCheck []byte, secretKey string) ([]byte, error) {
 	if secretKey == "" {
-		return "", errors.New("Empty secret key")
+		return nil, errors.WithStack(ErrSecretKeyEmpty)
 	}
 
-	if len(payload) == 0 {
-		return "", errors.New("Empty token")
+	buf := bytes.NewBuffer(toCheck)
+
+	_, err := buf.WriteString(secretKey)
+	if err != nil {
+		return nil, errors.WithStack(err)
 	}
 
-	return fmt.Sprintf("%x", md5.Sum(
-		[]byte(fmt.Sprintf("%s%s", payload, secretKey)))), nil
+	x := md5.Sum(buf.Bytes())
+
+	if len(toCheck) == 0 {
+		return x[:], errors.WithStack(ErrPayloadEmpty)
+	}
+
+	return x[:], nil
 }
 
-func NewWithSalt(payload []byte, secretKey, secretSalt string) (
-	string, error) {
+func NewWithSalt(toCheck []byte, secretKey, checksumSalt string) (
+	[]byte, error) {
 	if secretKey == "" {
-		return "", errors.New("Empty secret key")
+		return nil, errors.WithStack(ErrSecretKeyEmpty)
 	}
 
-	if secretSalt == "" {
-		return "", errors.New("Empty salt")
+	if checksumSalt == "" {
+		return nil, errors.New("missing salt")
 	}
 
-	s := fmt.Sprintf("%s%s%s", payload, secretSalt, secretKey)
+	buf := bytes.NewBuffer(toCheck)
 
-	return fmt.Sprintf("%x", md5.Sum([]byte(s))), nil
+	_, err := buf.WriteString(checksumSalt)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	_, err = buf.WriteString(secretKey)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	x := md5.Sum(buf.Bytes())
+
+	if len(toCheck) == 0 {
+		return x[:], errors.WithStack(ErrPayloadEmpty)
+	}
+
+	return x[:], nil
 }
