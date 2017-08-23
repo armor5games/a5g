@@ -26,7 +26,7 @@ func New(l *logrus.Logger) (*DummyOutputer, error) {
 
 func (l *DummyOutputer) Output(callDepth int, s string) error {
 	if l == nil {
-		return errors.New("nil pointer dereference")
+		return errors.New("nil pointer")
 	}
 
 	l.Logger.WithFields(map[string]interface{}{"callDepth": callDepth}).Debug(s)
