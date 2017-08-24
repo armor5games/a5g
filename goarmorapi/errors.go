@@ -31,7 +31,7 @@ func newErrorJSONs(s ErrorJSONSeverity, errs ...error) []*ErrorJSON {
 		e = append(e, &ErrorJSON{
 			Code:     s.ErrorDefaultCode(),
 			Severity: uint64(s),
-			Error:    err})
+			Err:      err})
 	}
 
 	return e

@@ -53,14 +53,14 @@ type JSONSuccessOrder struct {
 }
 
 func (e *JSONError) Error() string {
-	return fmt.Sprintf("%d critical=%t %s", e.Code, e.Critical, e.Err.Error())
+	return fmt.Sprintf("%d critical=%t %s", e.Code, e.Critical, e.Error())
 }
 
 func (e *JSONError) MarshalJSON() ([]byte, error) {
 	var m string
 
 	if e.Err != nil {
-		m = e.Err.Error()
+		m = e.Error()
 	}
 
 	return json.Marshal(&struct {

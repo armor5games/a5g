@@ -49,7 +49,7 @@ func (keyValues KVS) ResponseErrors() []*ErrorJSON {
 
 	for k, v := range keyValues {
 		e = append(e, &ErrorJSON{
-			Code: uint64(ErrCodeDefautlDebug), Error: fmt.Errorf("%s:%s", k, v)})
+			Code: uint64(ErrCodeDefautlDebug), Err: fmt.Errorf("%s:%s", k, v)})
 	}
 
 	return e

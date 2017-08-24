@@ -25,7 +25,7 @@ type JSONResponse struct {
 type ErrorJSON struct {
 	Code uint64
 	// TODO: Rename "Error" to "Err"
-	Error    error  `json:"message,omitempty"`
+	Err      error  `json:"message,omitempty"`
 	Public   bool   `json:"-"`
 	Severity uint64 `json:"-"`
 }
@@ -87,18 +87,22 @@ type ResponseErrorer interface {
 	ResponseErrors() []*ErrorJSON
 }
 
+func (e *ErrorJSON) Error() string {
+	return e.Err.Error()
+}
+
 func (e *ErrorJSON) MarshalJSON() ([]byte, error) {
 	var m string
 
-	if e.Error != nil {
-		m = e.Error.Error()
+	if e.Err != nil {
+		m = e.Error()
 	}
 
 	return json.Marshal(&struct {
 		Code    uint64 `json:"code,omitempty"`
 		Message string `json:"message,omitempty"`
 	}{
-		Code:    uint64(e.Code),
+		Code:    e.Code,
 		Message: m})
 }
 
@@ -115,7 +119,7 @@ func (e *ErrorJSON) UnmarshalJSON(b []byte) error {
 	e.Code = s.Code
 
 	if s.Message != "" {
-		e.Error = errors.New(s.Message)
+		e.Err = errors.New(s.Message)
 	}
 
 	return nil
@@ -137,11 +141,11 @@ func (j *JSONResponse) KV() (KV, error) {
 			continue
 		}
 
-		if e.Error.Error() == "" {
+		if e.Error() == "" {
 			return nil, errors.New("empty kv")
 		}
 
-		x := strings.SplitN(e.Error.Error(), ":", 2)
+		x := strings.SplitN(e.Error(), ":", 2)
 		if len(x) != 2 {
 			return nil, errors.New("bad kv format")
 		}
@@ -200,7 +204,7 @@ func newJSONResponseErrors(
 			publicErrors = append(publicErrors,
 				&ErrorJSON{
 					Code:     x.Code,
-					Error:    errors.New(x.Error.Error()),
+					Err:      errors.New(x.Error()),
 					Public:   x.Public,
 					Severity: x.Severity})
 		}
@@ -213,7 +217,7 @@ func newJSONResponseErrors(
 				publicErrors = append(publicErrors,
 					&ErrorJSON{
 						Code:     x.Code,
-						Error:    errors.New(x.Error.Error()),
+						Err:      errors.New(x.Error()),
 						Public:   x.Public,
 						Severity: x.Severity})
 
