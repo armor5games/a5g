@@ -10,6 +10,7 @@ type ConformanceServer struct {
 	Type         string `json:"type"`
 	ID           uint64 `json:"id"`
 	Version      uint64 `json:"version"`
+	StartedAt    string `json:"startedAt,omitempty"`
 	Architecture string `json:"architecture"`
 }
 
@@ -21,7 +22,8 @@ func NewConformance(
 	apiVersion string,
 	infrastructureVersion uint64,
 	serverTitle, serverName, serverArchitecture string,
-	serverID uint64) *Conformance {
+	serverID uint64,
+	startedAt string) *Conformance {
 	return &Conformance{
 		Name: serverTitle,
 		API:  &ConformanceClient{Version: apiVersion},
@@ -29,5 +31,6 @@ func NewConformance(
 			Type:         serverName,
 			ID:           serverID,
 			Version:      infrastructureVersion,
-			Architecture: serverArchitecture}}
+			Architecture: serverArchitecture,
+			StartedAt:    startedAt}}
 }
