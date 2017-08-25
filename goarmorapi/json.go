@@ -3,11 +3,12 @@ package goarmorapi
 import (
 	"context"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"strings"
 	"time"
 
 	"github.com/armor5games/goarmor/goarmorconfigs"
+	"github.com/pkg/errors"
 )
 
 type JSONRequest struct {
@@ -23,8 +24,7 @@ type JSONResponse struct {
 }
 
 type ErrorJSON struct {
-	Code uint64
-	// TODO: Rename "Error" to "Err"
+	Code     uint64 `json:"code"`
 	Err      error  `json:"message,omitempty"`
 	Public   bool   `json:"-"`
 	Severity uint64 `json:"-"`
@@ -92,18 +92,29 @@ func (e *ErrorJSON) Error() string {
 }
 
 func (e *ErrorJSON) MarshalJSON() ([]byte, error) {
-	var m string
+	var (
+		s string
+		a []string
+	)
 
 	if e.Err != nil {
-		m = e.Error()
+		s = e.Error()
+
+		switch ErrorJSONSeverity(e.Severity) {
+		case ErrSeverityError, ErrSeverityFatal, ErrSeverityPanic:
+			a = strings.Split(fmt.Sprintf("%+v", e.Err), "\n")
+			a = append(a[1:2], a[2:]...)
+		}
 	}
 
 	return json.Marshal(&struct {
-		Code    uint64 `json:"code,omitempty"`
-		Message string `json:"message,omitempty"`
+		Code       uint64   `json:"code,omitempty"`
+		Message    string   `json:"message,omitempty"`
+		StackTrace []string `json:"stackTrace,omitempty"`
 	}{
-		Code:    e.Code,
-		Message: m})
+		Code:       e.Code,
+		Message:    s,
+		StackTrace: a})
 }
 
 func (e *ErrorJSON) UnmarshalJSON(b []byte) error {
