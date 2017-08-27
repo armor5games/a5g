@@ -1,7 +1,6 @@
 package goarmorapi
 
 import (
-	"context"
 	"encoding/json"
 	"io/ioutil"
 	"mime"
@@ -46,20 +45,12 @@ func (ssr *SessionShardPayload) IsUserDataVersionPresent() bool {
 	return ssr.UserDataVersion != 0
 }
 
-func NewSession(ctx context.Context, requestToShard *http.Request) (
-	*SessionShardResponse, error) {
-	config, ok := ctx.Value(CtxKeyConfig).(*goarmorconfigs.Config)
-	if !ok {
-		return nil, errors.New("context.Value fn error")
-	}
-
-	l, ok := ctx.Value(CtxKeyLogger).(*logrus.Logger)
-	if !ok {
-		return nil, errors.New("context.Value fn error")
-	}
-
+func NewSession(
+	appLogger *logrus.Logger,
+	appConfig *goarmorconfigs.Config,
+	requestToShard *http.Request) (*SessionShardResponse, error) {
 	c := &http.Client{
-		Timeout: time.Second * time.Duration(config.Server.APITimeoutSeconds)}
+		Timeout: time.Second * time.Duration(appConfig.Server.APITimeoutSeconds)}
 
 	res, err := c.Do(requestToShard)
 	if err != nil {
@@ -69,7 +60,7 @@ func NewSession(ctx context.Context, requestToShard *http.Request) (
 		if err := res.Body.Close(); err != nil {
 			l.Error(err.Error())
 		}
-	}(l)
+	}(appLogger)
 
 	httpBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -81,7 +72,7 @@ func NewSession(ctx context.Context, requestToShard *http.Request) (
 
 	if res.StatusCode != http.StatusOK {
 		err = errors.New("session http status code error")
-		l.WithFields(logrus.Fields(kv)).Error(err.Error())
+		appLogger.WithFields(logrus.Fields(kv)).Error(err.Error())
 	}
 
 	kv["httpContentType"] = res.Header.Get("Content-type")
@@ -95,7 +86,7 @@ func NewSession(ctx context.Context, requestToShard *http.Request) (
 		err = errors.New("shard server's response is not in json format")
 
 		kv["httpBody"] = string(httpBody)
-		l.WithFields(logrus.Fields(kv)).Error(err.Error())
+		appLogger.WithFields(logrus.Fields(kv)).Error(err.Error())
 
 		return nil, err
 	}
@@ -108,7 +99,7 @@ func NewSession(ctx context.Context, requestToShard *http.Request) (
 
 	if !shardResponse.Success {
 		err = errors.New("session is not successful")
-		l.WithFields(logrus.Fields(kv)).Error(err.Error())
+		appLogger.WithFields(logrus.Fields(kv)).Error(err.Error())
 	}
 
 	kv["sessionSuccessStatus"] = shardResponse.Success
@@ -116,7 +107,7 @@ func NewSession(ctx context.Context, requestToShard *http.Request) (
 	if shardResponse.Payload == nil {
 		err = errors.New("empty session payload")
 
-		l.WithFields(logrus.Fields(kv)).Error(err.Error())
+		appLogger.WithFields(logrus.Fields(kv)).Error(err.Error())
 
 		return shardResponse, err
 	}
@@ -127,7 +118,7 @@ func NewSession(ctx context.Context, requestToShard *http.Request) (
 	if !shardResponse.Payload.IsUserDataVersionPresent() {
 		err = errors.New("shard server retruns zero user's data version")
 
-		l.WithFields(logrus.Fields(kv)).Error(err.Error())
+		appLogger.WithFields(logrus.Fields(kv)).Error(err.Error())
 
 		return shardResponse, err
 	}
@@ -138,17 +129,17 @@ func NewSession(ctx context.Context, requestToShard *http.Request) (
 	if !shardResponse.Payload.IsAccessTokenPresent() {
 		err = errors.New("shard server return zero access token")
 
-		l.WithFields(logrus.Fields(kv)).Error(err.Error())
+		appLogger.WithFields(logrus.Fields(kv)).Error(err.Error())
 
 		return shardResponse, err
 	}
 
 	accessTokenChecksum, err :=
-		goarmorchecksums.New([]byte(accessToken), config.Server.ServerSecretKey)
+		goarmorchecksums.New([]byte(accessToken), appConfig.Server.ServerSecretKey)
 	if err != nil {
 		err = errors.WithStack(err)
 
-		l.WithFields(logrus.Fields(kv)).Error(err.Error())
+		appLogger.WithFields(logrus.Fields(kv)).Error(err.Error())
 
 		return shardResponse, err
 	}
@@ -158,7 +149,7 @@ func NewSession(ctx context.Context, requestToShard *http.Request) (
 	if shardResponse.Payload.AccessTokenChecksum != string(accessTokenChecksum) {
 		err = errors.New("access token and access token's checksum mismatch")
 
-		l.WithFields(logrus.Fields(kv)).Error(err.Error())
+		appLogger.WithFields(logrus.Fields(kv)).Error(err.Error())
 
 		return shardResponse, err
 	}

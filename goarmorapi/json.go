@@ -1,13 +1,11 @@
 package goarmorapi
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/armor5games/goarmor/goarmorconfigs"
 	"github.com/pkg/errors"
 )
 
@@ -172,7 +170,6 @@ func (j *JSONResponse) KV() (KV, error) {
 }
 
 func NewJSONRequest(
-	ctx context.Context,
 	responsePayload interface{}) (*JSONRequest, error) {
 	return &JSONRequest{
 		Payload: responsePayload,
@@ -180,12 +177,13 @@ func NewJSONRequest(
 }
 
 func NewJSONResponse(
-	ctx context.Context,
+	debugLevel int,
 	isSuccess bool,
 	responsePayload interface{},
 	responseErrorer ResponseErrorer,
 	errs ...*ErrorJSON) (*JSONResponse, error) {
-	publicErrors, err := newJSONResponseErrors(ctx, responseErrorer, errs...)
+	publicErrors, err :=
+		newJSONResponseErrors(debugLevel, responseErrorer, errs...)
 	if err != nil {
 		return nil, err
 	}
@@ -198,19 +196,14 @@ func NewJSONResponse(
 }
 
 func newJSONResponseErrors(
-	ctx context.Context,
+	debugLevel int,
 	responseErrorer ResponseErrorer,
 	errs ...*ErrorJSON) ([]*ErrorJSON, error) {
-	config, ok := ctx.Value(CtxKeyConfig).(goarmorconfigs.Configer)
-	if !ok {
-		return nil, errors.New("context.Value fn error")
-	}
-
 	errs = append(errs, responseErrorer.ResponseErrors()...)
 
 	var publicErrors []*ErrorJSON
 
-	if config.ServerDebuggingLevel() > 0 {
+	if debugLevel > 0 {
 		for _, x := range errs {
 			publicErrors = append(publicErrors,
 				&ErrorJSON{

@@ -36,7 +36,7 @@ type Config struct {
 
 		ListenAddress  string
 		LogPath        string
-		DebuggingLevel uint64
+		DebuggingLevel int
 
 		ServerSecretKey string
 		ClientSecretKey string
