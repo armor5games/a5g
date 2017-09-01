@@ -8,11 +8,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-var (
-	ErrPayloadEmpty   = errors.New("empty payload")
-	ErrSecretKeyEmpty = errors.New("empty secret key")
-)
-
 func NewMD5(toCheck []byte, secretKey string) (string, error) {
 	if secretKey == "" {
 		return "", errors.WithStack(ErrSecretKeyEmpty)
