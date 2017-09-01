@@ -13,7 +13,7 @@ var (
 	ErrSecretKeyEmpty = errors.New("empty secret key")
 )
 
-func New(toCheck []byte, secretKey string) (string, error) {
+func NewMD5(toCheck []byte, secretKey string) (string, error) {
 	if secretKey == "" {
 		return "", errors.WithStack(ErrSecretKeyEmpty)
 	}
@@ -34,7 +34,8 @@ func New(toCheck []byte, secretKey string) (string, error) {
 	return hex.EncodeToString(a[:]), nil
 }
 
-func NewWithSalt(toCheck []byte, secretKey, checksumSalt string) (string, error) {
+func NewMD5Salted(toCheck []byte, secretKey, checksumSalt string) (
+	string, error) {
 	if secretKey == "" {
 		return "", errors.WithStack(ErrSecretKeyEmpty)
 	}

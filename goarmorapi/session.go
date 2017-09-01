@@ -135,7 +135,7 @@ func NewSession(
 	}
 
 	accessTokenChecksum, err :=
-		goarmorchecksums.New([]byte(accessToken), appConfig.Server.ServerSecretKey)
+		goarmorchecksums.NewMD5([]byte(accessToken), appConfig.Server.ServerSecretKey)
 	if err != nil {
 		err = errors.WithStack(err)
 
