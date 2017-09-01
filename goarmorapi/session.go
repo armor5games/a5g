@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/armor5games/goarmor/goarmorchecksums"
-	"github.com/armor5games/goarmor/goarmorconfigs"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -47,10 +46,14 @@ func (ssr *SessionShardPayload) IsUserDataVersionPresent() bool {
 
 func NewSession(
 	appLogger *logrus.Logger,
-	appConfig *goarmorconfigs.Config,
-	requestToShard *http.Request) (*SessionShardResponse, error) {
-	c := &http.Client{
-		Timeout: time.Second * time.Duration(appConfig.Server.APITimeoutSeconds)}
+	requestToShard *http.Request,
+	timeoutDuration time.Duration,
+	secretKey string) (*SessionShardResponse, error) {
+	if secretKey == "" {
+		return nil, errors.New("empty secret key")
+	}
+
+	c := &http.Client{Timeout: timeoutDuration}
 
 	res, err := c.Do(requestToShard)
 	if err != nil {
@@ -135,7 +138,7 @@ func NewSession(
 	}
 
 	accessTokenChecksum, err :=
-		goarmorchecksums.NewMD5([]byte(accessToken), appConfig.Server.ServerSecretKey)
+		goarmorchecksums.NewMD5([]byte(accessToken), secretKey)
 	if err != nil {
 		err = errors.WithStack(err)
 
