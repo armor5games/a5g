@@ -1,15 +1,21 @@
-package goarmorconfigs
+package goarmorjwt
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/pkg/errors"
 )
 
-func (c *Config) NewSession(userID int64, tokenDuration time.Duration) (
+var ErrSecretKeyEmpty = errors.New("empty secret key")
+
+func NewSession(userID int64, tokenDuration time.Duration, secretKey string) (
 	string, *jwt.StandardClaims, error) {
+	if secretKey == "" {
+		return "", nil, errors.WithStack(ErrSecretKeyEmpty)
+	}
+
 	t := time.Now()
 
 	sessionClaims := &jwt.StandardClaims{
@@ -19,11 +25,9 @@ func (c *Config) NewSession(userID int64, tokenDuration time.Duration) (
 	}
 
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, sessionClaims)
-	accessToken, err := jwtToken.
-		SignedString([]byte(c.Server.ServerSecretKey))
+	accessToken, err := jwtToken.SignedString([]byte(secretKey))
 	if err != nil {
-		return "", nil, fmt.Errorf("jwt.(*Token).SignedString fn error: %s",
-			err.Error())
+		return "", nil, errors.Wrap(err, "jwt.(*Token).SignedString fn")
 	}
 
 	return accessToken, sessionClaims, nil
