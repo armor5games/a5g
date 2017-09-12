@@ -10,6 +10,9 @@ import (
 	"github.com/pkg/errors"
 )
 
+// GoogleInappPurchaseData some documentation:
+// <https://developer.android.com/google/play/billing/billing_integrate.html#Purchase>,
+// <https://developer.android.com/google/play/billing/billing_reference.html>.
 type GoogleInappPurchaseData struct {
 	OrderID          string `json:"orderId"`
 	PackageName      string `json:"packageName"`
@@ -20,6 +23,7 @@ type GoogleInappPurchaseData struct {
 	PurchaseToken    string `json:"purchaseToken"`
 }
 
+// <https://developer.android.com/google/play/billing/billing_integrate.html#Purchase>.
 // {
 //    \"orderId\":\"12999763169054705758.1371079406387615\",
 //    \"packageName\":\"com.example.app\",
@@ -42,7 +46,8 @@ func IsValid(
 	// generate hash value from receipt
 	hasher := sha1.New()
 
-	if _, err = hasher.Write(saleReceipt); err != nil {
+	_, err = hasher.Write(saleReceipt)
+	if err != nil {
 		return false, errors.WithStack(err)
 	}
 
@@ -54,7 +59,6 @@ func IsValid(
 		return false, errors.WithStack(err)
 	}
 
-	// verify
 	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA1, hashedReceipt, decodedSignature)
 	if err != nil {
 		return false, errors.WithStack(err)
