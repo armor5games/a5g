@@ -6,24 +6,15 @@ import (
 	"crypto/sha1"
 	"crypto/x509"
 	"encoding/base64"
+	"strings"
 
 	"github.com/pkg/errors"
 )
 
-// GoogleInappPurchaseData some documentation:
+// GoogleInappPurchaseReceipt some documentation:
 // <https://developer.android.com/google/play/billing/billing_integrate.html#Purchase>,
 // <https://developer.android.com/google/play/billing/billing_reference.html>.
-type GoogleInappPurchaseData struct {
-	OrderID          string `json:"orderId"`
-	PackageName      string `json:"packageName"`
-	ProductID        string `json:"productId"`
-	PurchaseTime     uint64 `json:"purchaseTime"`
-	PurchaseState    uint64 `json:"purchaseState"`
-	DeveloperPayload string `json:"developerPayload,omitempty"`
-	PurchaseToken    string `json:"purchaseToken"`
-}
-
-// <https://developer.android.com/google/play/billing/billing_integrate.html#Purchase>.
+// Example:
 // {
 //    \"orderId\":\"12999763169054705758.1371079406387615\",
 //    \"packageName\":\"com.example.app\",
@@ -33,6 +24,15 @@ type GoogleInappPurchaseData struct {
 //    \"developerPayload\":\"bGoa+V7g/yqDXvKRqq+JTFn4uQZbPiQJo4pf9RzJ\",
 //    \"purchaseToken\":\"rojeslcdyyiapnqcynkjyyjh\"
 //  }
+type GoogleInappPurchaseReceipt struct {
+	OrderID          string `json:"orderId"`
+	PackageName      string `json:"packageName"`
+	ProductID        string `json:"productId"`
+	PurchaseTime     uint64 `json:"purchaseTime"`
+	PurchaseState    uint64 `json:"purchaseState"`
+	DeveloperPayload string `json:"developerPayload,omitempty"`
+	PurchaseToken    string `json:"purchaseToken"`
+}
 
 // IsValid <https://developer.android.com/google/play/licensing/setting-up.html>.
 func IsValid(
@@ -65,6 +65,30 @@ func IsValid(
 	}
 
 	return true, nil
+}
+
+func (v *GoogleInappPurchaseReceipt) Validate() error {
+	if strings.TrimSpace(v.OrderID) == "" {
+		return errors.New("missing google inapp purchase order id")
+	}
+
+	if strings.TrimSpace(v.PackageName) == "" {
+		return errors.New("missing google inapp purchase ")
+	}
+
+	if strings.TrimSpace(v.ProductID) == "" {
+		return errors.New("missing google inapp purchase ")
+	}
+
+	if v.PurchaseTime < 1 {
+		return errors.New("missing google inapp purchase ")
+	}
+
+	if strings.TrimSpace(v.PurchaseToken) == "" {
+		return errors.New("missing google inapp purchase ")
+	}
+
+	return nil
 }
 
 func decodePublicKey(base64EncodedPublicKey string) (*rsa.PublicKey, error) {
