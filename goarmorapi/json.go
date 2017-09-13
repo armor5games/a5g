@@ -40,33 +40,37 @@ const (
 	ErrSeverityPanic
 )
 
-func (s ErrorJSONSeverity) ErrorDefaultCode() uint64 {
-	var c ErrorJSONCode
+func (v ErrorJSONSeverity) Uint64() uint64 {
+	return uint64(v)
+}
 
-	switch s {
+func (v ErrorJSONSeverity) ErrorDefaultCode() uint64 {
+	var u ErrorJSONCode
+
+	switch v {
 	default:
 		return 0
 
 	case ErrSeverityDebug:
-		c = ErrCodeDefautlDebug
+		u = ErrCodeDefautlDebug
 
 	case ErrSeverityInfo:
-		c = ErrCodeDefautlInfo
+		u = ErrCodeDefautlInfo
 
 	case ErrSeverityWarn:
-		c = ErrCodeDefautlWarn
+		u = ErrCodeDefautlWarn
 
 	case ErrSeverityError:
-		c = ErrCodeDefautlError
+		u = ErrCodeDefautlError
 
 	case ErrSeverityFatal:
-		c = ErrCodeDefautlFatal
+		u = ErrCodeDefautlFatal
 
 	case ErrSeverityPanic:
-		c = ErrCodeDefautlPanic
+		u = ErrCodeDefautlPanic
 	}
 
-	return uint64(c)
+	return uint64(u)
 }
 
 type ErrorJSONCode uint64
