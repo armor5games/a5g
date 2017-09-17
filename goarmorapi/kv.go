@@ -12,6 +12,20 @@ func NewKV() KV {
 	return newKV(nil)
 }
 
+func (keyValues KV) String() string {
+	if len(keyValues) == 0 {
+		return ""
+	}
+
+	kv := make([]string, 0, len(keyValues))
+
+	for k, v := range keyValues {
+		kv = append(kv, fmt.Sprintf("%s:%s", k, v))
+	}
+
+	return fmt.Sprintf("kv:[%s]", strings.Join(kv, " "))
+}
+
 func (keyValues KV) KVS() KVS {
 	if len(keyValues) == 0 {
 		return nil
@@ -30,20 +44,6 @@ func (keyValues KV) Merge(newKeyValues KV) {
 	for k, v := range newKeyValues {
 		keyValues[k] = v
 	}
-}
-
-func (keyValues KV) String() string {
-	if len(keyValues) == 0 {
-		return ""
-	}
-
-	kv := make([]string, 0, len(keyValues))
-
-	for k, v := range keyValues {
-		kv = append(kv, fmt.Sprintf("%s:%s", k, v))
-	}
-
-	return fmt.Sprintf("kvs:[%s]", strings.Join(kv, " "))
 }
 
 func (keyValues KV) ResponseErrors() []*ErrorJSON {

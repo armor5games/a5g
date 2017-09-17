@@ -1,6 +1,9 @@
 package goarmorapi
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // KVS is an key and values of type string
 type KVS map[string]string
@@ -18,6 +21,20 @@ const (
 
 func (v KVSValueBoolean) String() string {
 	return string(v)
+}
+
+func (keyValues KVS) String() string {
+	if len(keyValues) == 0 {
+		return ""
+	}
+
+	kv := make([]string, 0, len(keyValues))
+
+	for k, v := range keyValues {
+		kv = append(kv, fmt.Sprintf("%s:%s", k, v))
+	}
+
+	return fmt.Sprintf("kvs:[%s]", strings.Join(kv, " "))
 }
 
 func (keyValues KVS) KV() KV {
