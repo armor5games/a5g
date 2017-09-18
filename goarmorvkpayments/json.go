@@ -7,8 +7,8 @@ import (
 )
 
 type JSONResponse struct {
-	Error   *JSONError  `json:"error,omitempty"`
-	Payload interface{} `json:"response,omitempty"`
+	Error   *JSONError  `json:"Error,omitempty"`
+	Payload interface{} `json:"Response,omitempty"`
 }
 
 // JSONError <https://vk.com/dev/payments_errors>.

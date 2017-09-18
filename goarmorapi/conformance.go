@@ -1,20 +1,20 @@
 package goarmorapi
 
 type Conformance struct {
-	Name   string             `json:"name"`
-	Server *ConformanceServer `json:"server"`
-	API    *ConformanceClient `json:"api"`
+	Name   string             `json:"Name"`
+	Server *ConformanceServer `json:"Server"`
+	API    *ConformanceClient `json:"Api"`
 }
 
 type ConformanceServer struct {
-	Type         string `json:"type"`
-	ID           uint64 `json:"id"`
-	Version      uint64 `json:"version"`
-	Architecture string `json:"architecture"`
+	Type         string `json:"Type"`
+	ID           uint64 `json:"Id"`
+	Version      uint64 `json:"Version"`
+	Architecture string `json:"Architecture"`
 }
 
 type ConformanceClient struct {
-	Version string `json:"version"`
+	Version string `json:"Version"`
 }
 
 func NewConformance(

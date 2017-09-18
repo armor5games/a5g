@@ -16,27 +16,27 @@ import (
 )
 
 type SessionLoginPayload struct {
-	UserID               uint64 `json:"userId,omitempty"`
-	UserDataVersion      uint64 `json:"userDataVersion,omitempty"`
-	AccessToken          string `json:"accessToken,omitempty"`
-	AccessExpiresAt      uint64 `json:"accessExpiresAt,omitempty"`
-	ShardURL             string `json:"shardUrl,omitempty"`
-	StaticDataVersion    uint64 `json:"staticDataVersion,omitempty"`
-	UserName             string `json:"userName,omitempty"`
-	UserNameChangesCount uint64 `json:"userNameChangeCount,omitempty"`
-	NewUser              bool   `json:"newUser"`
+	UserID               uint64 `json:"UserId,omitempty"`
+	UserDataVersion      uint64 `json:"UserDataVersion,omitempty"`
+	AccessToken          string `json:"AccessToken,omitempty"`
+	AccessExpiresAt      uint64 `json:"AccessExpiresAt,omitempty"`
+	ShardURL             string `json:"ShardUrl,omitempty"`
+	StaticDataVersion    uint64 `json:"StaticDataVersion,omitempty"`
+	UserName             string `json:"UserName,omitempty"`
+	UserNameChangesCount uint64 `json:"UserNameChangeCount,omitempty"`
+	NewUser              bool   `json:"NewUser,omitempty"`
 }
 
 type SessionShardResponse struct {
 	JSONResponse
-	Payload *SessionShardPayload `json:"payload,omitempty"`
+	Payload *SessionShardPayload `json:"Payload,omitempty"`
 }
 
 type SessionShardPayload struct {
-	AccessToken         string `json:"accessToken,omitempty"`
-	AccessTokenChecksum string `json:"accessTokenChecksum,omitempty"`
-	AccessExpiresAt     uint64 `json:"accessExpiresAt,omitempty"`
-	UserDataVersion     uint64 `json:"userDataVersion,omitempty"`
+	AccessToken         string `json:"AccessToken,omitempty"`
+	AccessTokenChecksum string `json:"AccessTokenChecksum,omitempty"`
+	AccessExpiresAt     uint64 `json:"AccessExpiresAt,omitempty"`
+	UserDataVersion     uint64 `json:"UserDataVersion,omitempty"`
 }
 
 func (ssr *SessionShardPayload) IsAccessTokenPresent() bool {

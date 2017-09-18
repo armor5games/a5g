@@ -9,7 +9,7 @@ import (
 )
 
 type DummyHealth struct {
-	Logger *logrus.Logger `json:"logger"`
+	Logger *logrus.Logger `json:"Logger"`
 }
 
 func NewDummyHealth(l *logrus.Logger) (*DummyHealth, error) {
