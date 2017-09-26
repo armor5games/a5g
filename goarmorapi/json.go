@@ -91,18 +91,6 @@ type ResponseErrorer interface {
 	ResponseErrors() []*ErrorJSON
 }
 
-func (errorsJSON ErrorsJSON) Slice() []*ErrorJSON {
-	return []*ErrorJSON(errorsJSON)
-}
-
-func (errorsJSON ErrorsJSON) Append(v *ErrorJSON) ErrorsJSON {
-	a := []*ErrorJSON(errorsJSON)
-
-	a = append(a, v)
-
-	return ErrorsJSON(a)
-}
-
 func (errorsJSON ErrorsJSON) First() error {
 	a := []*ErrorJSON(errorsJSON)
 
