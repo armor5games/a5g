@@ -21,6 +21,8 @@ type JSONResponse struct {
 	Time    uint64       `json:"time,omitempty"`
 }
 
+type ErrorsJSON []*ErrorJSON
+
 type ErrorJSON struct {
 	Code     uint64 `json:"code"`
 	Err      error  `json:"message,omitempty"`
@@ -87,6 +89,38 @@ const (
 
 type ResponseErrorer interface {
 	ResponseErrors() []*ErrorJSON
+}
+
+func (errorsJSON ErrorsJSON) Slice() []*ErrorJSON {
+	return []*ErrorJSON(errorsJSON)
+}
+
+func (errorsJSON ErrorsJSON) Append(v *ErrorJSON) ErrorsJSON {
+	a := []*ErrorJSON(errorsJSON)
+
+	a = append(a, v)
+
+	return ErrorsJSON(a)
+}
+
+func (errorsJSON ErrorsJSON) First() error {
+	a := []*ErrorJSON(errorsJSON)
+
+	if len(a) == 0 {
+		return nil
+	}
+
+	return a[0]
+}
+
+func (errorsJSON ErrorsJSON) Last() error {
+	a := []*ErrorJSON(errorsJSON)
+
+	if len(a) == 0 {
+		return nil
+	}
+
+	return a[len(a)-1]
 }
 
 func (e *ErrorJSON) Error() string {
