@@ -1,4 +1,4 @@
-// package goarmorlogs by chi example
+// Package goarmorlogs by chi example
 // <https://github.com/pressly/chi/blob/master/_examples/logging/main.go>
 package goarmorlogs
 
