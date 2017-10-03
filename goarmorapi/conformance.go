@@ -12,6 +12,7 @@ type ConformanceServer struct {
 	Type         string `json:"type"`
 	ID           uint64 `json:"id"`
 	Version      uint64 `json:"version"`
+	ReleaseStage string `json:"releaseStage"`
 	Sharded      bool   `json:"sharded,omitempty"`
 	ShardsCount  uint64 `json:"shardsCount,omitempty"`
 	StartedAt    string `json:"startedAt,omitempty"`
@@ -25,6 +26,7 @@ type ConformanceClient struct {
 func NewConformance(
 	apiVersion string,
 	infrastructureVersion uint64,
+	releaseStageName string,
 	serverTitle, serverName, serverArchitecture string,
 	serverID uint64,
 	shardsCount int,
@@ -40,6 +42,7 @@ func NewConformance(
 			Type:         serverName,
 			ID:           serverID,
 			Version:      infrastructureVersion,
+			ReleaseStage: releaseStageName,
 			Sharded:      shardsCount > 0,
 			ShardsCount:  uint64(shardsCount),
 			Architecture: serverArchitecture,
