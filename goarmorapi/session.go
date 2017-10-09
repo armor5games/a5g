@@ -22,6 +22,7 @@ type SessionLoginPayload struct {
 	UserName             string `json:"userName,omitempty"`
 	UserNameChangesCount uint64 `json:"userNameChangeCount,omitempty"`
 	NewUser              bool   `json:"newUser,omitempty"`
+	LatestClientVersion  uint64 `json:"latestClientVersion,omitempty"`
 }
 
 type SessionShardResponse struct {
