@@ -10,17 +10,16 @@ import (
 
 var ErrSecretKeyEmpty = errors.New("empty secret key")
 
-func NewSession(userID int64, tokenDuration time.Duration, secretKey string) (
+func NewSession(
+	secretKey string, userID int64, issuedAt time.Time, lifeTime time.Duration) (
 	string, *jwt.StandardClaims, error) {
 	if secretKey == "" {
 		return "", nil, errors.WithStack(ErrSecretKeyEmpty)
 	}
 
-	t := time.Now()
-
 	sessionClaims := &jwt.StandardClaims{
-		ExpiresAt: t.Add(tokenDuration).Unix(),
-		IssuedAt:  t.Unix(),
+		ExpiresAt: issuedAt.Add(lifeTime).Unix(),
+		IssuedAt:  issuedAt.Unix(),
 		Issuer:    strconv.FormatInt(userID, 10),
 	}
 

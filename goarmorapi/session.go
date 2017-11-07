@@ -7,24 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/armor5games/goarmor/goarmorchecksums"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
-
-type SessionLoginPayload struct {
-	UserID               uint64 `json:"userId,omitempty"`
-	AccessToken          string `json:"accessToken,omitempty"`
-	AccessExpiresAt      uint64 `json:"accessExpiresAt,omitempty"`
-	ShardURL             string `json:"shardUrl,omitempty"`
-	UserDataVersion      uint64 `json:"userDataVersion,omitempty"`
-	StaticDataVersion    uint64 `json:"staticDataVersion,omitempty"`
-	UserName             string `json:"userName,omitempty"`
-	UserNameChangesCount uint64 `json:"userNameChangeCount,omitempty"`
-	NewUser              bool   `json:"newUser,omitempty"`
-	LatestClientVersion  uint64 `json:"latestClientVersion,omitempty"`
-	ClientMetricsURL     string `json:"loggerURL,omitempty"`
-}
 
 type SessionShardResponse struct {
 	JSONResponse
@@ -32,18 +17,11 @@ type SessionShardResponse struct {
 }
 
 type SessionShardPayload struct {
-	AccessToken         string `json:"accessToken,omitempty"`
-	AccessTokenChecksum string `json:"accessTokenChecksum,omitempty"`
-	AccessExpiresAt     uint64 `json:"accessExpiresAt,omitempty"`
-	UserDataVersion     uint64 `json:"userDataVersion,omitempty"`
+	UserDataVersion uint64 `json:"userDataVersion,omitempty"`
 }
 
-func (ssr *SessionShardPayload) IsAccessTokenPresent() bool {
-	return len(ssr.AccessToken) >= 16
-}
-
-func (ssr *SessionShardPayload) IsUserDataVersionPresent() bool {
-	return ssr.UserDataVersion != 0
+func (v *SessionShardPayload) IsUserDataVersionPresent() bool {
+	return v.UserDataVersion != 0
 }
 
 func NewSession(
@@ -96,7 +74,8 @@ func NewSession(
 		return nil, err
 	}
 
-	shardResponse := new(SessionShardResponse)
+	var shardResponse = new(SessionShardResponse)
+
 	err = json.Unmarshal(httpBody, shardResponse)
 	if err != nil {
 		return nil, errors.Wrap(err, "json.Unmarshal fn")
@@ -122,37 +101,6 @@ func NewSession(
 
 	if !shardResponse.Payload.IsUserDataVersionPresent() {
 		err = errors.New("shard server retruns zero user's data version")
-
-		appLogger.WithFields(logrus.Fields(kv)).Error(err.Error())
-
-		return shardResponse, err
-	}
-
-	accessToken := shardResponse.Payload.AccessToken
-	kv["accessToken"] = accessToken
-
-	if !shardResponse.Payload.IsAccessTokenPresent() {
-		err = errors.New("shard server return zero access token")
-
-		appLogger.WithFields(logrus.Fields(kv)).Error(err.Error())
-
-		return shardResponse, err
-	}
-
-	accessTokenChecksum, err :=
-		goarmorchecksums.NewMD5([]byte(accessToken), secretKey)
-	if err != nil {
-		err = errors.WithStack(err)
-
-		appLogger.WithFields(logrus.Fields(kv)).Error(err.Error())
-
-		return shardResponse, err
-	}
-
-	kv["accessTokenChecksum"] = accessTokenChecksum
-
-	if shardResponse.Payload.AccessTokenChecksum != string(accessTokenChecksum) {
-		err = errors.New("access token and access token's checksum mismatch")
 
 		appLogger.WithFields(logrus.Fields(kv)).Error(err.Error())
 
