@@ -57,6 +57,16 @@ func (keyValues KVS) Merge(newKeyValues KVS) {
 	}
 }
 
+func (keyValues KVS) Copy() KVS {
+	var newKeyValues = NewKVS()
+
+	for k, v := range keyValues {
+		newKeyValues[k] = v
+	}
+
+	return newKeyValues
+}
+
 func (keyValues KVS) ResponseErrors() []*ErrorJSON {
 	if len(keyValues) == 0 {
 		return nil
