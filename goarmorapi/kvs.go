@@ -3,6 +3,8 @@ package goarmorapi
 import (
 	"fmt"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 // KVS is an key and values of type string
@@ -35,6 +37,14 @@ func (keyValues KVS) String() string {
 	}
 
 	return fmt.Sprintf("kvs:[%s]", strings.Join(kv, " "))
+}
+
+func (keyValues KVS) Error() error {
+	if len(keyValues) == 0 {
+		return nil
+	}
+
+	return errors.New(keyValues.String())
 }
 
 func (keyValues KVS) KV() KV {
