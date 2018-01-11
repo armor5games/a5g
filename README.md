@@ -7,6 +7,6 @@ See .travis.yml for supported go versions.
 
 ## License
 
-Copyright (c) 2017 [Armor5games](https://github.com/armor5games)
+Copyright (c) 2018 [Armor5games](https://github.com/armor5games)
 
 Licensed under [MIT License](./LICENSE)
