@@ -2,6 +2,7 @@ sudo: false
 language: go
 go:
   - 1.8.x
+  - 1.9.x
   - master
 before_install:
   - go get -v -u github.com/client9/misspell/cmd/misspell
