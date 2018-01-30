@@ -94,7 +94,7 @@ type ResponseErrorer interface {
 func (errorsJSON ErrorsJSON) Errors() []error {
 	var a []error
 	for _, e := range errorsJSON {
-		a = append(a, error(e))
+		a = append(a, e.Err)
 	}
 	return a
 }
