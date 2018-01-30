@@ -91,6 +91,14 @@ type ResponseErrorer interface {
 	ResponseErrors() []*ErrorJSON
 }
 
+func (errorsJSON ErrorsJSON) Errors() []error {
+	var a []error
+	for _, e := range errorsJSON {
+		a = append(a, error(e))
+	}
+	return a
+}
+
 func (errorsJSON ErrorsJSON) First() error {
 	a := []*ErrorJSON(errorsJSON)
 
