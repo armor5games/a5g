@@ -12,6 +12,8 @@ type KVS map[string]string
 
 type KVSValueBoolean string
 
+func (keyValues KVS) Error() string { return keyValues.String() }
+
 func NewKVS() KVS { return newKVS(nil) }
 
 const (
@@ -32,7 +34,7 @@ func (keyValues KVS) String() string {
 	return fmt.Sprintf("kvs:[%s]", strings.Join(kv, " "))
 }
 
-func (keyValues KVS) Error() error {
+func (keyValues KVS) Err() error {
 	if len(keyValues) == 0 {
 		return nil
 	}

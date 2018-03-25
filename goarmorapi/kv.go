@@ -10,6 +10,8 @@ import (
 // KV is an key-values
 type KV map[string]interface{}
 
+func (keyValues KV) Error() string { return keyValues.String() }
+
 func NewKV() KV { return newKV(nil) }
 
 func (keyValues KV) String() string {
@@ -23,7 +25,7 @@ func (keyValues KV) String() string {
 	return fmt.Sprintf("kv:[%s]", strings.Join(kv, " "))
 }
 
-func (keyValues KV) Error() error {
+func (keyValues KV) Err() error {
 	if len(keyValues) == 0 {
 		return nil
 	}
