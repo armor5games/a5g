@@ -66,14 +66,14 @@ func (keyValues KVS) Copy() KVS {
 	return newKeyValues
 }
 
-func (keyValues KVS) ResponseErrors() []*ErrorJSON {
+func (keyValues KVS) ResponseMessages() []*JSONMsg {
 	if len(keyValues) == 0 {
 		return nil
 	}
-	e := make([]*ErrorJSON, 0, len(keyValues))
+	e := make([]*JSONMsg, 0, len(keyValues))
 	for k, v := range keyValues {
-		e = append(e, &ErrorJSON{
-			Code: uint64(ErrCodeDefautlDebug), Err: fmt.Errorf("%s:%s", k, v)})
+		e = append(e, &JSONMsg{
+			Code: uint64(MsgCodeDefaultDebug), Err: fmt.Errorf("%s:%s", k, v)})
 	}
 	return e
 }

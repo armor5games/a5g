@@ -1,34 +1,34 @@
 package goarmorapi
 
-func NewErrorJSONDefautlDebugs(errs ...error) []*ErrorJSON {
-	return newErrorJSONs(ErrSeverityDebug, errs...)
+func NewJSONMsgDefautlDebugs(errs ...error) []*JSONMsg {
+	return newJSONMsgs(MsgSeverityDebug, errs...)
 }
 
-func NewErrorJSONDefautlInfos(errs ...error) []*ErrorJSON {
-	return newErrorJSONs(ErrSeverityInfo, errs...)
+func NewJSONMsgDefautlInfos(errs ...error) []*JSONMsg {
+	return newJSONMsgs(MsgSeverityInfo, errs...)
 }
 
-func NewErrorJSONDefautlWarns(errs ...error) []*ErrorJSON {
-	return newErrorJSONs(ErrSeverityWarn, errs...)
+func NewJSONMsgDefautlWarns(errs ...error) []*JSONMsg {
+	return newJSONMsgs(MsgSeverityWarn, errs...)
 }
 
-func NewErrorJSONDefautlErrors(errs ...error) []*ErrorJSON {
-	return newErrorJSONs(ErrSeverityError, errs...)
+func NewJSONMsgDefautlErrors(errs ...error) []*JSONMsg {
+	return newJSONMsgs(MsgSeverityError, errs...)
 }
 
-func NewErrorJSONDefautlFatals(errs ...error) []*ErrorJSON {
-	return newErrorJSONs(ErrSeverityFatal, errs...)
+func NewJSONMsgDefautlFatals(errs ...error) []*JSONMsg {
+	return newJSONMsgs(MsgSeverityFatal, errs...)
 }
 
-func NewErrorJSONDefautlPanics(errs ...error) []*ErrorJSON {
-	return newErrorJSONs(ErrSeverityPanic, errs...)
+func NewJSONMsgDefautlPanics(errs ...error) []*JSONMsg {
+	return newJSONMsgs(MsgSeverityPanic, errs...)
 }
 
-func newErrorJSONs(s ErrorJSONSeverity, errs ...error) []*ErrorJSON {
-	var e []*ErrorJSON
+func newJSONMsgs(s JSONMsgSeverity, errs ...error) []*JSONMsg {
+	var e []*JSONMsg
 
 	for _, err := range errs {
-		e = append(e, &ErrorJSON{
+		e = append(e, &JSONMsg{
 			Code:     s.ErrorDefaultCode(),
 			Severity: uint64(s),
 			Err:      err})

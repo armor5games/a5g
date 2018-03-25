@@ -15,130 +15,124 @@ type JSONRequest struct {
 }
 
 type JSONResponse struct {
-	Success bool         `json:"success"`
-	Errors  []*ErrorJSON `json:"messages,omitempty"`
-	Payload interface{}  `json:"payload,omitempty"`
-	Time    uint64       `json:"time,omitempty"`
+	Success  bool        `json:"success"`
+	Messages []*JSONMsg  `json:"messages,omitempty"`
+	Payload  interface{} `json:"payload,omitempty"`
+	Time     uint64      `json:"time,omitempty"`
 }
 
-type ErrorsJSON []*ErrorJSON
+type JSONMessages []*JSONMsg
 
-type ErrorJSON struct {
+type JSONMsg struct {
 	Code     uint64 `json:"code"`
 	Err      error  `json:"message,omitempty"`
 	Public   bool   `json:"-"`
 	Severity uint64 `json:"-"`
 }
 
-type ErrorJSONSeverity uint64
+type JSONMsgSeverity uint64
 
 const (
-	ErrSeverityUnknown ErrorJSONSeverity = iota
-	ErrSeverityDebug
-	ErrSeverityInfo
-	ErrSeverityWarn
-	ErrSeverityError
-	ErrSeverityFatal
-	ErrSeverityPanic
+	MsgSeverityUnknown JSONMsgSeverity = iota
+	MsgSeverityDebug
+	MsgSeverityInfo
+	MsgSeverityWarn
+	MsgSeverityError
+	MsgSeverityFatal
+	MsgSeverityPanic
 )
 
-func (v ErrorJSONSeverity) Uint64() uint64 {
+func (v JSONMsgSeverity) Uint64() uint64 {
 	return uint64(v)
 }
 
-func (v ErrorJSONSeverity) ErrorDefaultCode() uint64 {
-	var u ErrorJSONCode
-
+func (v JSONMsgSeverity) ErrorDefaultCode() uint64 {
+	var u JSONMsgCode
 	switch v {
 	default:
 		return 0
-
-	case ErrSeverityDebug:
-		u = ErrCodeDefautlDebug
-
-	case ErrSeverityInfo:
-		u = ErrCodeDefautlInfo
-
-	case ErrSeverityWarn:
-		u = ErrCodeDefautlWarn
-
-	case ErrSeverityError:
-		u = ErrCodeDefautlError
-
-	case ErrSeverityFatal:
-		u = ErrCodeDefautlFatal
-
-	case ErrSeverityPanic:
-		u = ErrCodeDefautlPanic
+	case MsgSeverityDebug:
+		u = MsgCodeDefaultDebug
+	case MsgSeverityInfo:
+		u = MsgCodeDefaultInfo
+	case MsgSeverityWarn:
+		u = MsgCodeDefaultWarn
+	case MsgSeverityError:
+		u = MsgCodeDefaultError
+	case MsgSeverityFatal:
+		u = MsgCodeDefaultFatal
+	case MsgSeverityPanic:
+		u = MsgCodeDefaultPanic
 	}
-
 	return uint64(u)
 }
 
-type ErrorJSONCode uint64
+type JSONMsgCode uint64
 
 const (
-	ErrCodeDefautlDebug ErrorJSONCode = 1100
-	ErrCodeDefautlInfo
-	ErrCodeDefautlWarn
+	MsgCodeDefaultDebug JSONMsgCode = 1100
+	MsgCodeDefaultInfo
+	MsgCodeDefaultWarn
 
-	ErrCodeDefautlError ErrorJSONCode = 5100
-	ErrCodeDefautlFatal
-	ErrCodeDefautlPanic
+	MsgCodeDefaultError JSONMsgCode = 5100
+	MsgCodeDefaultFatal
+	MsgCodeDefaultPanic
 )
 
-type ResponseErrorer interface {
-	ResponseErrors() []*ErrorJSON
+func (v *JSONResponse) Errors() []error {
+	var a []error
+	if v == nil || len(v.Messages) == 0 {
+		return a
+	}
+	for _, e := range v.Messages {
+		a = append(a, e)
+	}
+	return a
 }
 
-func (errorsJSON ErrorsJSON) Errors() []error {
+type ResponseMessenger interface {
+	ResponseMessages() []*JSONMsg
+}
+
+func (v JSONMessages) Errors() []error {
 	var a []error
-	for _, e := range errorsJSON {
+	for _, e := range v {
 		a = append(a, e.Err)
 	}
 	return a
 }
 
-func (errorsJSON ErrorsJSON) First() error {
-	a := []*ErrorJSON(errorsJSON)
-
+func (v JSONMessages) First() error {
+	a := []*JSONMsg(v)
 	if len(a) == 0 {
 		return nil
 	}
-
 	return a[0]
 }
 
-func (errorsJSON ErrorsJSON) Last() error {
-	a := []*ErrorJSON(errorsJSON)
-
+func (v JSONMessages) Last() error {
+	a := []*JSONMsg(v)
 	if len(a) == 0 {
 		return nil
 	}
-
 	return a[len(a)-1]
 }
 
-func (e *ErrorJSON) Error() string {
-	return e.Err.Error()
-}
+func (e *JSONMsg) Error() string { return e.Err.Error() }
 
-func (e *ErrorJSON) MarshalJSON() ([]byte, error) {
+func (e *JSONMsg) MarshalJSON() ([]byte, error) {
 	var (
 		s string
 		a []string
 	)
-
 	if e.Err != nil {
 		s = e.Error()
-
-		switch ErrorJSONSeverity(e.Severity) {
-		case ErrSeverityError, ErrSeverityFatal, ErrSeverityPanic:
+		switch JSONMsgSeverity(e.Severity) {
+		case MsgSeverityError, MsgSeverityFatal, MsgSeverityPanic:
 			a = strings.Split(fmt.Sprintf("%+v", e.Err), "\n")
 			a = append(a[1:2], a[2:]...)
 		}
 	}
-
 	return json.Marshal(&struct {
 		Code       uint64   `json:"code,omitempty"`
 		Message    string   `json:"message,omitempty"`
@@ -149,57 +143,45 @@ func (e *ErrorJSON) MarshalJSON() ([]byte, error) {
 		StackTrace: a})
 }
 
-func (e *ErrorJSON) UnmarshalJSON(b []byte) error {
+func (e *JSONMsg) UnmarshalJSON(b []byte) error {
 	s := &struct {
 		Code    uint64 `json:"code"`
 		Message string `json:"message"`
 	}{}
-
 	if err := json.Unmarshal(b, &s); err != nil {
 		return err
 	}
-
 	e.Code = s.Code
-
 	if s.Message != "" {
 		e.Err = errors.New(s.Message)
 	}
-
 	return nil
 }
 
-func (j *JSONResponse) KV() (KV, error) {
-	if j == nil {
+func (a *JSONResponse) KV() (KV, error) {
+	if a == nil {
 		return nil, errors.New("empty api response")
 	}
-
-	if len(j.Errors) == 0 {
+	if len(a.Messages) == 0 {
 		return nil, errors.New("empty key values")
 	}
-
 	kv := NewKV()
-
-	for _, e := range j.Errors {
-		if e.Code != uint64(ErrCodeDefautlDebug) {
+	for _, e := range a.Messages {
+		if e.Code != uint64(MsgCodeDefaultDebug) {
 			continue
 		}
-
 		if e.Error() == "" {
 			return nil, errors.New("empty kv")
 		}
-
 		x := strings.SplitN(e.Error(), ":", 2)
 		if len(x) != 2 {
 			return nil, errors.New("bad kv format")
 		}
-
 		kv[x[0]] = x[1]
 	}
-
 	if len(kv) == 0 {
 		return nil, errors.New("empty kv")
 	}
-
 	return kv, nil
 }
 
@@ -214,46 +196,41 @@ func NewJSONResponse(
 	debugLevel int,
 	isSuccess bool,
 	responsePayload interface{},
-	responseErrorer ResponseErrorer,
-	errs ...*ErrorJSON) (*JSONResponse, error) {
-	publicErrors, err :=
-		newJSONResponseErrors(debugLevel, responseErrorer, errs...)
+	responseMessenger ResponseMessenger,
+	errs ...*JSONMsg) (*JSONResponse, error) {
+	publicMessages, err :=
+		newJSONResponseMessages(debugLevel, responseMessenger, errs...)
 	if err != nil {
 		return nil, err
 	}
-
 	return &JSONResponse{
-		Success: isSuccess,
-		Errors:  publicErrors,
-		Payload: responsePayload,
-		Time:    uint64(time.Now().Unix())}, nil
+		Success:  isSuccess,
+		Messages: publicMessages,
+		Payload:  responsePayload,
+		Time:     uint64(time.Now().Unix())}, nil
 }
 
-func newJSONResponseErrors(
+func newJSONResponseMessages(
 	debugLevel int,
-	responseErrorer ResponseErrorer,
-	errs ...*ErrorJSON) ([]*ErrorJSON, error) {
-	errs = append(errs, responseErrorer.ResponseErrors()...)
-
-	var publicErrors []*ErrorJSON
-
+	responseMessenger ResponseMessenger,
+	errs ...*JSONMsg) ([]*JSONMsg, error) {
+	errs = append(errs, responseMessenger.ResponseMessages()...)
+	var publicMessages []*JSONMsg
 	if debugLevel > 0 {
 		for _, x := range errs {
-			publicErrors = append(publicErrors,
-				&ErrorJSON{
+			publicMessages = append(publicMessages,
+				&JSONMsg{
 					Code:     x.Code,
 					Err:      errors.New(x.Error()),
 					Public:   x.Public,
 					Severity: x.Severity})
 		}
-
 	} else {
 		isKVRemoved := false
-
 		for _, x := range errs {
 			if x.Public {
-				publicErrors = append(publicErrors,
-					&ErrorJSON{
+				publicMessages = append(publicMessages,
+					&JSONMsg{
 						Code:     x.Code,
 						Err:      errors.New(x.Error()),
 						Public:   x.Public,
@@ -261,23 +238,18 @@ func newJSONResponseErrors(
 
 				continue
 			}
-
-			if x.Code == uint64(ErrCodeDefautlDebug) {
+			if x.Code == uint64(MsgCodeDefaultDebug) {
 				isKVRemoved = true
-
 				continue
 			}
-
-			publicErrors = append(publicErrors,
-				&ErrorJSON{Code: x.Code, Severity: x.Severity})
+			publicMessages = append(publicMessages,
+				&JSONMsg{Code: x.Code, Severity: x.Severity})
 		}
-
 		if isKVRemoved {
-			// Add empty (only with "code") "ErrorJSON" structure in order to be able to
+			// Add empty (only with "code") "JSONMsg" structure in order to be able to
 			// determine was an key-values in hadler's response.
-			publicErrors = append(publicErrors, &ErrorJSON{Code: uint64(ErrCodeDefautlDebug)})
+			publicMessages = append(publicMessages, &JSONMsg{Code: uint64(MsgCodeDefaultDebug)})
 		}
 	}
-
-	return publicErrors, nil
+	return publicMessages, nil
 }
