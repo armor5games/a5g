@@ -5,6 +5,7 @@ import "github.com/gocraft/dbr"
 type Pooler interface {
 	ReadPool() Connector
 	WritePool() Connector
+	Validate() error
 }
 
 type Connector interface {
