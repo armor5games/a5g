@@ -66,14 +66,14 @@ func (keyValues KVS) Copy() KVS {
 	return newKeyValues
 }
 
-func (keyValues KVS) ResponseMessages() []*JSONMsg {
+func (keyValues KVS) ResponseMessages() []*APIErr {
 	if len(keyValues) == 0 {
 		return nil
 	}
-	e := make([]*JSONMsg, 0, len(keyValues))
+	e := make([]*APIErr, 0, len(keyValues))
 	for k, v := range keyValues {
-		e = append(e, &JSONMsg{
-			Code: uint64(MsgCodeDefaultDebug), Err: fmt.Errorf("%s:%s", k, v)})
+		e = append(e, &APIErr{
+			Code: uint64(ErrCodeDefaultDebug), Err: fmt.Errorf("%s:%s", k, v)})
 	}
 	return e
 }

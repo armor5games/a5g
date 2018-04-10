@@ -9,92 +9,94 @@ import (
 	"github.com/pkg/errors"
 )
 
-type JSONRequest struct {
+type APIMsgRequest struct {
 	Payload interface{} `json:"payload,omitempty"`
 	Time    uint64      `json:"time,omitempty"`
 }
 
-type JSONResponse struct {
-	Success  bool        `json:"success"`
-	Messages []*JSONMsg  `json:"messages,omitempty"`
-	Payload  interface{} `json:"payload,omitempty"`
-	Time     uint64      `json:"time,omitempty"`
+type APIMsgResponse APIMsg
+
+type APIMsg struct {
+	Success bool        `json:"success"`
+	Errs    []*APIErr   `json:"messages,omitempty"`
+	Payload interface{} `json:"payload,omitempty"`
+	Time    uint64      `json:"time,omitempty"`
 }
 
-type JSONMessages []*JSONMsg
+type APIErrs []*APIErr
 
-type JSONMsg struct {
+type APIErr struct {
 	Code     uint64 `json:"code"`
 	Err      error  `json:"message,omitempty"`
 	Public   bool   `json:"-"`
 	Severity uint64 `json:"-"`
 }
 
-type JSONMsgSeverity uint64
+type ErrSeverity uint64
 
 const (
-	MsgSeverityUnknown JSONMsgSeverity = iota
-	MsgSeverityDebug
-	MsgSeverityInfo
-	MsgSeverityWarn
-	MsgSeverityError
-	MsgSeverityFatal
-	MsgSeverityPanic
+	ErrSeverityUnknown ErrSeverity = iota
+	ErrSeverityDebug
+	ErrSeverityInfo
+	ErrSeverityWarn
+	ErrSeverityError
+	ErrSeverityFatal
+	ErrSeverityPanic
 )
 
-func (v JSONMsgSeverity) Uint64() uint64 {
+func (v ErrSeverity) Uint64() uint64 {
 	return uint64(v)
 }
 
-func (v JSONMsgSeverity) ErrorDefaultCode() uint64 {
-	var u JSONMsgCode
+type APIErrCode uint64
+
+func (v ErrSeverity) ErrorDefaultCode() uint64 {
+	var u APIErrCode
 	switch v {
 	default:
 		return 0
-	case MsgSeverityDebug:
-		u = MsgCodeDefaultDebug
-	case MsgSeverityInfo:
-		u = MsgCodeDefaultInfo
-	case MsgSeverityWarn:
-		u = MsgCodeDefaultWarn
-	case MsgSeverityError:
-		u = MsgCodeDefaultError
-	case MsgSeverityFatal:
-		u = MsgCodeDefaultFatal
-	case MsgSeverityPanic:
-		u = MsgCodeDefaultPanic
+	case ErrSeverityDebug:
+		u = ErrCodeDefaultDebug
+	case ErrSeverityInfo:
+		u = ErrCodeDefaultInfo
+	case ErrSeverityWarn:
+		u = ErrCodeDefaultWarn
+	case ErrSeverityError:
+		u = ErrCodeDefaultError
+	case ErrSeverityFatal:
+		u = ErrCodeDefaultFatal
+	case ErrSeverityPanic:
+		u = ErrCodeDefaultPanic
 	}
 	return uint64(u)
 }
 
-type JSONMsgCode uint64
-
 const (
-	MsgCodeDefaultDebug JSONMsgCode = 1100
-	MsgCodeDefaultInfo
-	MsgCodeDefaultWarn
+	ErrCodeDefaultDebug APIErrCode = 1100
+	ErrCodeDefaultInfo
+	ErrCodeDefaultWarn
 
-	MsgCodeDefaultError JSONMsgCode = 5100
-	MsgCodeDefaultFatal
-	MsgCodeDefaultPanic
+	ErrCodeDefaultError APIErrCode = 5100
+	ErrCodeDefaultFatal
+	ErrCodeDefaultPanic
 )
 
-func (v *JSONResponse) Errors() []error {
+func (v *APIMsg) Errors() []error {
 	var a []error
-	if v == nil || len(v.Messages) == 0 {
+	if v == nil || len(v.Errs) == 0 {
 		return a
 	}
-	for _, e := range v.Messages {
+	for _, e := range v.Errs {
 		a = append(a, e)
 	}
 	return a
 }
 
 type ResponseMessenger interface {
-	ResponseMessages() []*JSONMsg
+	ResponseMessages() []*APIErr
 }
 
-func (v JSONMessages) Errors() []error {
+func (v APIErrs) Errors() []error {
 	var a []error
 	for _, e := range v {
 		a = append(a, e.Err)
@@ -102,33 +104,33 @@ func (v JSONMessages) Errors() []error {
 	return a
 }
 
-func (v JSONMessages) First() error {
-	a := []*JSONMsg(v)
+func (v APIErrs) First() error {
+	a := []*APIErr(v)
 	if len(a) == 0 {
 		return nil
 	}
 	return a[0]
 }
 
-func (v JSONMessages) Last() error {
-	a := []*JSONMsg(v)
+func (v APIErrs) Last() error {
+	a := []*APIErr(v)
 	if len(a) == 0 {
 		return nil
 	}
 	return a[len(a)-1]
 }
 
-func (e *JSONMsg) Error() string { return e.Err.Error() }
+func (e *APIErr) Error() string { return e.Err.Error() }
 
-func (e *JSONMsg) MarshalJSON() ([]byte, error) {
+func (e *APIErr) MarshalJSON() ([]byte, error) {
 	var (
 		s string
 		a []string
 	)
 	if e.Err != nil {
 		s = e.Error()
-		switch JSONMsgSeverity(e.Severity) {
-		case MsgSeverityError, MsgSeverityFatal, MsgSeverityPanic:
+		switch ErrSeverity(e.Severity) {
+		case ErrSeverityError, ErrSeverityFatal, ErrSeverityPanic:
 			a = strings.Split(fmt.Sprintf("%+v", e.Err), "\n")
 			a = append(a[1:2], a[2:]...)
 		}
@@ -143,7 +145,7 @@ func (e *JSONMsg) MarshalJSON() ([]byte, error) {
 		StackTrace: a})
 }
 
-func (e *JSONMsg) UnmarshalJSON(b []byte) error {
+func (e *APIErr) UnmarshalJSON(b []byte) error {
 	s := &struct {
 		Code    uint64 `json:"code"`
 		Message string `json:"message"`
@@ -158,16 +160,16 @@ func (e *JSONMsg) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (a *JSONResponse) KV() (KV, error) {
+func (a *APIMsg) KV() (KV, error) {
 	if a == nil {
 		return nil, errors.New("empty api response")
 	}
-	if len(a.Messages) == 0 {
+	if len(a.Errs) == 0 {
 		return nil, errors.New("empty key values")
 	}
 	kv := NewKV()
-	for _, e := range a.Messages {
-		if e.Code != uint64(MsgCodeDefaultDebug) {
+	for _, e := range a.Errs {
+		if e.Code != uint64(ErrCodeDefaultDebug) {
 			continue
 		}
 		if e.Error() == "" {
@@ -185,41 +187,59 @@ func (a *JSONResponse) KV() (KV, error) {
 	return kv, nil
 }
 
-func NewJSONRequest(
-	responsePayload interface{}) (*JSONRequest, error) {
-	return &JSONRequest{
+func NewMsgRequest(
+	responsePayload interface{}) (*APIMsgRequest, error) {
+	return &APIMsgRequest{
 		Payload: responsePayload,
 		Time:    uint64(time.Now().Unix())}, nil
 }
 
-func NewJSONResponse(
+func NewMsgResponse(
 	debugLevel int,
 	isSuccess bool,
 	responsePayload interface{},
 	responseMessenger ResponseMessenger,
-	errs ...*JSONMsg) (*JSONResponse, error) {
-	publicMessages, err :=
-		newJSONResponseMessages(debugLevel, responseMessenger, errs...)
+	errs ...*APIErr) (*APIMsgResponse, error) {
+	publicErrs, err :=
+		newMsgResponseErrs(debugLevel, responseMessenger, errs...)
 	if err != nil {
 		return nil, err
 	}
-	return &JSONResponse{
-		Success:  isSuccess,
-		Messages: publicMessages,
-		Payload:  responsePayload,
-		Time:     uint64(time.Now().Unix())}, nil
+	return &APIMsgResponse{
+		Success: isSuccess,
+		Errs:    publicErrs,
+		Payload: responsePayload,
+		Time:    uint64(time.Now().Unix())}, nil
 }
 
-func newJSONResponseMessages(
+func NewMsg(
+	debugLevel int,
+	isSuccess bool,
+	responsePayload interface{},
+	responseMessenger ResponseMessenger,
+	errs ...*APIErr) (*APIMsg, error) {
+	publicErrs, err :=
+		newMsgResponseErrs(debugLevel, responseMessenger, errs...)
+	if err != nil {
+		return nil, err
+	}
+	return &APIMsg{
+		Success: isSuccess,
+		Errs:    publicErrs,
+		Payload: responsePayload,
+		Time:    uint64(time.Now().Unix())}, nil
+}
+
+func newMsgResponseErrs(
 	debugLevel int,
 	responseMessenger ResponseMessenger,
-	errs ...*JSONMsg) ([]*JSONMsg, error) {
+	errs ...*APIErr) ([]*APIErr, error) {
 	errs = append(errs, responseMessenger.ResponseMessages()...)
-	var publicMessages []*JSONMsg
+	var publicErrs []*APIErr
 	if debugLevel > 0 {
 		for _, x := range errs {
-			publicMessages = append(publicMessages,
-				&JSONMsg{
+			publicErrs = append(publicErrs,
+				&APIErr{
 					Code:     x.Code,
 					Err:      errors.New(x.Error()),
 					Public:   x.Public,
@@ -229,8 +249,8 @@ func newJSONResponseMessages(
 		isKVRemoved := false
 		for _, x := range errs {
 			if x.Public {
-				publicMessages = append(publicMessages,
-					&JSONMsg{
+				publicErrs = append(publicErrs,
+					&APIErr{
 						Code:     x.Code,
 						Err:      errors.New(x.Error()),
 						Public:   x.Public,
@@ -238,18 +258,18 @@ func newJSONResponseMessages(
 
 				continue
 			}
-			if x.Code == uint64(MsgCodeDefaultDebug) {
+			if x.Code == uint64(ErrCodeDefaultDebug) {
 				isKVRemoved = true
 				continue
 			}
-			publicMessages = append(publicMessages,
-				&JSONMsg{Code: x.Code, Severity: x.Severity})
+			publicErrs = append(publicErrs,
+				&APIErr{Code: x.Code, Severity: x.Severity})
 		}
 		if isKVRemoved {
-			// Add empty (only with "code") "JSONMsg" structure in order to be able to
+			// Add empty (only with "code") "APIErr" structure in order to be able to
 			// determine was an key-values in hadler's response.
-			publicMessages = append(publicMessages, &JSONMsg{Code: uint64(MsgCodeDefaultDebug)})
+			publicErrs = append(publicErrs, &APIErr{Code: uint64(ErrCodeDefaultDebug)})
 		}
 	}
-	return publicMessages, nil
+	return publicErrs, nil
 }

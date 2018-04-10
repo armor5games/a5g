@@ -12,7 +12,7 @@ import (
 )
 
 type SessionShardResponse struct {
-	JSONResponse
+	APIMsg
 	Payload *SessionShardPayload `json:"payload,omitempty"`
 }
 
