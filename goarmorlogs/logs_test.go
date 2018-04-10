@@ -23,19 +23,11 @@ func TestDirectoryAndLogName(t *testing.T) {
 		{"...", ".", ""},
 		{".", ".", ""},
 	}
-
-	var (
-		x, y string
-		r    *regexp.Regexp
-
-		err error
-	)
-
-	r, err = regexp.Compile("^[.]+$")
+	r, err := regexp.Compile("^[.]+$")
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	var x, y string
 	for _, v := range a {
 		x, y, err = DirectoryAndLogName(v.in, r)
 		if err != nil || x != v.dir || y != v.file {
@@ -53,12 +45,10 @@ func TestPartitionedPathByUserID(t *testing.T) {
 		{1, "000/000/001"},
 		{123456789, "123/456/789"},
 	}
-
 	var (
 		s   string
 		err error
 	)
-
 	for _, v := range a {
 		s, err = PartitionedPathByUserID(v.in)
 		if err != nil || s != v.want {
