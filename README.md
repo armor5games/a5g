@@ -1,4 +1,4 @@
-# Armor5games
+# Armor5Games
 
 [![build status](https://travis-ci.org/armor5games/a5g.svg)](https://travis-ci.org/armor5games/a5g)
 
