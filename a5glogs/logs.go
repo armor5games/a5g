@@ -16,7 +16,6 @@ func DirectoryAndLogName(logPath string, fileExcludeRegexp *regexp.Regexp) (
 	var (
 		logDirName  string
 		logFileName string
-		err         error
 	)
 	fileInfo, err := os.Stat(logPath)
 	if err != nil && os.IsNotExist(err) {
