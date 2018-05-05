@@ -16,7 +16,6 @@ func NewDummyHealth(l *logrus.Logger) (*DummyHealth, error) {
 	if l == nil {
 		return nil, errors.New("nil pointer")
 	}
-
 	return &DummyHealth{Logger: l}, nil
 }
 
@@ -35,12 +34,12 @@ func (l *DummyHealth) EventErr(eventName string, err error) error {
 }
 
 func (l *DummyHealth) EventErrKv(eventName string, err error, kvs map[string]string) error {
-	logrusKV := dummyHealthKVToLogrusFields(kvs)
-	a5gapiKV := a5gapi.KV(logrusKV)
-
+	var (
+		logrusKV = dummyHealthKVToLogrusFields(kvs)
+		a5gapiKV = a5gapi.KV(logrusKV)
+	)
 	err = fmt.Errorf("%s %s", eventName, err.Error())
 	l.Logger.WithFields(logrusKV).Error(err.Error())
-
 	return fmt.Errorf("%s %s", err.Error(), a5gapiKV.String())
 }
 
@@ -59,12 +58,9 @@ func dummyHealthKVToLogrusFields(keyValues map[string]string) logrus.Fields {
 	if len(keyValues) == 0 {
 		return nil
 	}
-
 	f := make(logrus.Fields)
-
 	for k, v := range keyValues {
 		f[k] = v
 	}
-
 	return f
 }

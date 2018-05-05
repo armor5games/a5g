@@ -22,13 +22,10 @@ type StructuredLogger struct {
 func (l *StructuredLogger) NewLogEntry(r *http.Request) middleware.LogEntry {
 	entry := &StructuredLoggerEntry{Logger: logrus.NewEntry(l.Logger)}
 	logFields := logrus.Fields{}
-
 	logFields["ts"] = time.Now().UTC().Format(time.RFC1123)
-
 	if reqID := middleware.GetReqID(r.Context()); reqID != "" {
 		logFields["reqID"] = reqID
 	}
-
 	scheme := "http"
 	if r.TLS != nil {
 		scheme = "https"
@@ -36,16 +33,11 @@ func (l *StructuredLogger) NewLogEntry(r *http.Request) middleware.LogEntry {
 	logFields["httpScheme"] = scheme
 	logFields["httpProto"] = r.Proto
 	logFields["httpMethod"] = r.Method
-
 	logFields["remoteAddr"] = r.RemoteAddr
 	logFields["userAgent"] = r.UserAgent()
-
 	logFields["uri"] = fmt.Sprintf("%s://%s%s", scheme, r.Host, r.RequestURI)
-
 	entry.Logger = entry.Logger.WithFields(logFields)
-
 	entry.Logger.Debugln("request started")
-
 	return entry
 }
 
@@ -59,7 +51,6 @@ func (l *StructuredLoggerEntry) Write(status, bytes int, elapsed time.Duration) 
 		"respBytesLength": bytes,
 		"respElaspedMs":   float64(elapsed.Nanoseconds()) / 1000000.0,
 	})
-
 	l.Logger.Debugln("request complete")
 }
 
