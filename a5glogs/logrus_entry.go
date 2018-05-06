@@ -5,15 +5,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func NewLogrusWrapper(l *logrus.Logger) Logger {
-	return &logrusWrapper{logger: l}
-}
+type logrusEntryWrapper struct{ logger *logrus.Entry }
 
-type logrusWrapper struct{ logger *logrus.Logger }
-
-func (l *logrusWrapper) With(a ...a5gfields.Field) Logger {
+func (l *logrusEntryWrapper) With(a ...a5gfields.Field) Logger {
 	if len(a) == 0 {
-		return &logrusEntryWrapper{logger: logrus.NewEntry(l.logger)}
+		return &logrusEntryWrapper{logger: l.logger}
 	}
 	m := make(logrus.Fields)
 	for _, v := range a {
@@ -22,7 +18,7 @@ func (l *logrusWrapper) With(a ...a5gfields.Field) Logger {
 	return &logrusEntryWrapper{logger: l.logger.WithFields(m)}
 }
 
-func (l *logrusWrapper) Debug(s string, a ...a5gfields.Field) {
+func (l *logrusEntryWrapper) Debug(s string, a ...a5gfields.Field) {
 	if len(a) == 0 {
 		l.logger.Debug(s)
 		return
@@ -34,7 +30,7 @@ func (l *logrusWrapper) Debug(s string, a ...a5gfields.Field) {
 	l.logger.WithFields(m).Debug(s)
 }
 
-func (l *logrusWrapper) Info(s string, a ...a5gfields.Field) {
+func (l *logrusEntryWrapper) Info(s string, a ...a5gfields.Field) {
 	if len(a) == 0 {
 		l.logger.Info(s)
 		return
@@ -46,7 +42,7 @@ func (l *logrusWrapper) Info(s string, a ...a5gfields.Field) {
 	l.logger.WithFields(m).Info(s)
 }
 
-func (l *logrusWrapper) Warn(s string, a ...a5gfields.Field) {
+func (l *logrusEntryWrapper) Warn(s string, a ...a5gfields.Field) {
 	if len(a) == 0 {
 		l.logger.Warn(s)
 		return
@@ -58,7 +54,7 @@ func (l *logrusWrapper) Warn(s string, a ...a5gfields.Field) {
 	l.logger.WithFields(m).Warn(s)
 }
 
-func (l *logrusWrapper) Error(s string, a ...a5gfields.Field) {
+func (l *logrusEntryWrapper) Error(s string, a ...a5gfields.Field) {
 	if len(a) == 0 {
 		l.logger.Error(s)
 		return
@@ -70,7 +66,7 @@ func (l *logrusWrapper) Error(s string, a ...a5gfields.Field) {
 	l.logger.WithFields(m).Error(s)
 }
 
-func (l *logrusWrapper) Panic(s string, a ...a5gfields.Field) {
+func (l *logrusEntryWrapper) Panic(s string, a ...a5gfields.Field) {
 	if len(a) == 0 {
 		l.logger.Panic(s)
 		return
@@ -82,7 +78,7 @@ func (l *logrusWrapper) Panic(s string, a ...a5gfields.Field) {
 	l.logger.WithFields(m).Panic(s)
 }
 
-func (l *logrusWrapper) Fatal(s string, a ...a5gfields.Field) {
+func (l *logrusEntryWrapper) Fatal(s string, a ...a5gfields.Field) {
 	if len(a) == 0 {
 		l.logger.Fatal(s)
 		return
