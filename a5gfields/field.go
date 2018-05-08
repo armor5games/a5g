@@ -7,16 +7,6 @@ import (
 	"github.com/armor5games/a5g/a5gvalues"
 )
 
-type Field interface {
-	Key() string
-	Value() string
-}
-
-func New(k string, v fmt.Stringer) *kvField { return &kvField{key: k, value: v} }
-
-func (v *kvField) Key() string   { return v.key }
-func (v *kvField) Value() string { return v.value.String() }
-
 func Bytes(k string, v []byte) *kvField {
 	return &kvField{key: k, value: a5gvalues.Bytes(v)}
 }
@@ -44,6 +34,16 @@ func Int64(k string, v int64) *kvField {
 func String(k string, v string) *kvField {
 	return &kvField{key: k, value: a5gvalues.String(v)}
 }
+
+type Field interface {
+	Key() string
+	Value() string
+}
+
+func New(k string, v fmt.Stringer) *kvField { return &kvField{key: k, value: v} }
+
+func (v *kvField) Key() string   { return v.key }
+func (v *kvField) Value() string { return v.value.String() }
 
 // kvField is an key-value pair (kv)
 type kvField struct {
