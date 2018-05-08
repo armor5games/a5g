@@ -37,6 +37,10 @@ func Int(k string, v int) *kvField {
 	return &kvField{key: k, value: a5gvalues.Int(v)}
 }
 
+func Int64(k string, v int64) *kvField {
+	return &kvField{key: k, value: a5gvalues.Int64(v)}
+}
+
 func String(k string, v string) *kvField {
 	return &kvField{key: k, value: a5gvalues.String(v)}
 }

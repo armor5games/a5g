@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/armor5games/a5g/a5gfields"
-	"github.com/armor5games/a5g/a5gvalues"
 	"github.com/pkg/errors"
 )
 
@@ -60,7 +59,7 @@ func (m KVS) Fields() []a5gfields.Field {
 	}
 	a := make([]a5gfields.Field, 0, len(m))
 	for k, v := range m {
-		a = append(a, a5gfields.New(k, a5gvalues.String(v)))
+		a = append(a, a5gfields.String(k, v))
 	}
 	return a
 }

@@ -27,6 +27,10 @@ func Int(v int) *kvValue {
 	return &kvValue{typ: intType, valueInt64: int64(v)}
 }
 
+func Int64(v int64) *kvValue {
+	return &kvValue{typ: intType, valueInt64: int64(v)}
+}
+
 func String(v string) *kvValue {
 	return &kvValue{typ: stringType, valueString: v}
 }
@@ -41,7 +45,7 @@ func (v *kvValue) String() string {
 		return fmt.Sprintf("%+v", time.Duration(v.valueInt64))
 	case float64Type:
 		return fmt.Sprintf("%+v", math.Float64frombits(uint64(v.valueInt64)))
-	case intType:
+	case intType, int64Type:
 		return strconv.FormatInt(v.valueInt64, 10)
 	case emptyInterfaceType:
 		return fmt.Sprintf("%+v", v.valueEmptyInterface)
@@ -65,6 +69,7 @@ const (
 	bytesType
 	durationType
 	float64Type
+	int64Type
 	intType
 	stringType
 	// EmptyInterfaceType indicates that the field carries an interface{}, which should
