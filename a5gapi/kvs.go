@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/armor5games/a5g/a5gfields"
+	"github.com/armor5games/a5g/a5gvalues"
 	"github.com/pkg/errors"
 )
 
@@ -50,6 +52,17 @@ func (keyValues KVS) KV() KV {
 		kv[k] = v
 	}
 	return kv
+}
+
+func (m KVS) Fields() []a5gfields.Field {
+	if len(m) == 0 {
+		return nil
+	}
+	a := make([]a5gfields.Field, 0, len(m))
+	for k, v := range m {
+		a = append(a, a5gfields.New(k, a5gvalues.String(v)))
+	}
+	return a
 }
 
 func (keyValues KVS) Merge(newKeyValues KVS) {

@@ -4,69 +4,82 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/armor5games/a5g/a5gfields"
+	"github.com/armor5games/a5g/a5gvalues"
 	"github.com/pkg/errors"
 )
 
 // KV is an key-values
 type KV map[string]interface{}
 
-func (keyValues KV) Error() string { return keyValues.String() }
+func (m KV) Error() string { return m.String() }
 
 func NewKV() KV { return newKV(nil) }
 
-func (keyValues KV) String() string {
-	if len(keyValues) == 0 {
+func (m KV) String() string {
+	if len(m) == 0 {
 		return ""
 	}
-	kv := make([]string, 0, len(keyValues))
-	for k, v := range keyValues {
+	kv := make([]string, 0, len(m))
+	for k, v := range m {
 		kv = append(kv, fmt.Sprintf("%s:%s", k, v))
 	}
 	return fmt.Sprintf("kv:[%s]", strings.Join(kv, " "))
 }
 
-func (keyValues KV) Err() error {
-	if len(keyValues) == 0 {
+func (m KV) Err() error {
+	if len(m) == 0 {
 		return nil
 	}
-	return errors.New(keyValues.String())
+	return errors.New(m.String())
 }
 
-func (keyValues KV) KVS() KVS {
-	if len(keyValues) == 0 {
+func (m KV) KVS() KVS {
+	if len(m) == 0 {
 		return nil
 	}
 	kvs := make(KVS)
-	for k, v := range keyValues {
+	for k, v := range m {
 		kvs[k] = fmt.Sprint(v)
 	}
 	return kvs
 }
 
-func (keyValues KV) Merge(newKeyValues KV) {
-	for k, v := range newKeyValues {
-		keyValues[k] = v
-	}
-}
-
-func (keyValues KV) Copy() KV {
-	var newKeyValues = NewKV()
-	for k, v := range keyValues {
-		newKeyValues[k] = v
-	}
-	return newKeyValues
-}
-
-func (keyValues KV) ResponseMessages() []*APIErr {
-	if len(keyValues) == 0 {
+func (m KV) Fields() []a5gfields.Field {
+	if len(m) == 0 {
 		return nil
 	}
-	e := make([]*APIErr, 0, len(keyValues))
-	for k, v := range keyValues {
-		e = append(e, &APIErr{
+	a := make([]a5gfields.Field, 0, len(m))
+	for k, v := range m {
+		a = append(a, a5gfields.New(k, a5gvalues.EmptyInterface(v)))
+	}
+	return a
+}
+
+func (m KV) Merge(m2 KV) {
+	for k, v := range m2 {
+		m[k] = v
+	}
+}
+
+func (m KV) Copy() KV {
+	var m2 = NewKV()
+	for k, v := range m {
+		m2[k] = v
+	}
+	return m2
+}
+
+func (m KV) ResponseMessages() []*APIErr {
+	if len(m) == 0 {
+		return nil
+	}
+	a := make([]*APIErr, 0, len(m))
+	for k, v := range m {
+		a = append(a, &APIErr{
 			Code: uint64(ErrCodeDefaultDebug), Err: fmt.Errorf("%s:%s", k, v)})
 	}
-	return e
+	return a
 }
 
 func newKV(m map[string]interface{}) KV {
